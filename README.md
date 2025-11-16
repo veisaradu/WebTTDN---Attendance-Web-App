@@ -1,1 +1,117 @@
 # WebTTDN---Attendance-Web-App
+
+## 📌 1. Tehnologii
+
+
+
+---
+
+## 📌 2. Funcționalități complete ale aplicației
+
+### 1. Gestionare grupuri de evenimente
+OE poate crea un grup de evenimente.  
+Un grup poate conține:
+- un singur eveniment
+- sau o serie de evenimente recurente pe o perioadă de timp
+
+---
+
+### 2. Gestionarea evenimentelor
+Un eveniment are trei stări:
+- **CLOSED** – implicit, înainte de start
+- **OPEN** – activ în intervalul programat
+- **CLOSED** – după încheiere
+
+La creare, un eveniment generează automat:
+- cod text
+- cod QR
+
+---
+
+### 3. Confirmarea prezenței
+Participanții pot confirma prezența:
+- prin introducerea codului text
+- prin scanarea codului QR
+
+---
+
+### 4. Monitorizare în timp real
+OE poate vizualiza:
+- lista participanților prezenți
+- ora exactă la care fiecare participant s-a înregistrat
+
+---
+
+### 5. Export date
+OE poate exporta lista participanților:
+- pentru un singur eveniment
+- pentru un grup întreg
+- format **CSV**
+
+---
+
+### 6. Dashboard statistic
+Include:
+- număr total de participanți la un eveniment
+- număr participanți unici într-un grup de evenimente
+- grafic al prezenței în timp
+- procent de prezență vs absență
+
+---
+
+### 7. Marcarea manuală a prezenței
+OE poate marca un participant ca **prezent** sau **absent**, manual, în cazurile când:
+- participantul nu poate scana
+- codul nu a funcționat
+- există participanți invitați pe listă
+
+---
+
+### 8. Setări avansate pentru eveniment
+OE poate configura:
+- limită maximă de participanți
+- descriere extinsă a evenimentului
+- tipul evenimentului (curs, laborator, meeting, workshop)
+
+---
+
+### 9. Confirmări unice de prezență
+- fiecare participant poate confirma o singură dată la același eveniment folosind o adresă IP
+
+---
+
+### 10. Confirmare vizuală
+După confirmare, aplicația poate afișa:
+- o animație (ex.: confetti)
+
+---
+
+### 11. Istoric prezențe
+Participanții pot vedea:
+- lista evenimentelor la care au fost prezenți
+- ora confirmării
+- status: prezent sau absent (dacă sunt adăugați de organizator)
+
+---
+
+### 12. Auto-generare evenimente
+OE poate crea evenimente recurente prin selectarea:
+- zilelor săptămânii
+- intervalului de timp (ex: 1 martie – 30 aprilie)
+- ora evenimentului
+
+---
+
+### 13. Cod acces cu expirare
+- codul devine automat invalid când evenimentul este **CLOSED**
+- opțional: cod rotativ (regenerează la fiecare X minute)
+
+---
+
+### 14. Editare / ștergere evenimente
+OE poate modifica:
+- data
+- ora
+- durata
+- descrierea
+- group-ul din care face parte evenimentul
