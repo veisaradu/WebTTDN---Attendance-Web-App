@@ -2,7 +2,17 @@
 
 ## 📌 1. Tehnologii
 
+###  Front-end
+- **React.js**
+- **Charting Library** (Chart.js / Recharts)
+- **QR Scanner** (react-qr-reader / react-qr-scanner)
 
+---
+
+###  Back-end
+- **Node.js**
+- **Prisma ORM**
+- **PostgreSQL**
 
 ---
 
