@@ -12,7 +12,7 @@
 ###  Back-end
 - **Node.js**
 - **Prisma ORM**
-- **PostgreSQL**
+- **MySQL**
 
 ---
 
