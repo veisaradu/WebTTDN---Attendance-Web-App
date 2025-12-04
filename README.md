@@ -1,7 +1,8 @@
 # WebTTDN---Attendance-Web-App
 
 ## Ghid de rulare
-### 1. Instalare dependete
+### 1. Instalare dependete si MySql
+- instalare MySql
 - creeare fisier .env si adaugat url si port pt baza de date
 - DATABASE_URL="mysql://root:PASSWORD@localhost:3306/attendance_app" (password va fi inlocuit cu parola bazei de date locale)
 - PORT=5000
