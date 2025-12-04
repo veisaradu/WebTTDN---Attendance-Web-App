@@ -2,6 +2,9 @@
 
 ## Ghid de rulare
 ### 1. Instalare dependete
+- creeare fisier .env si adaugat url si port pt baza de date
+- DATABASE_URL="mysql://root:PASSWORD@localhost:3306/attendance_app" (password va fi inlocuit cu parola bazei de date locale)
+- PORT=5000
 - in bash in directorul backend de rulat npm install
 
 ### 2. Start la server
