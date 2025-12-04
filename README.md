@@ -1,5 +1,88 @@
 # WebTTDN---Attendance-Web-App
 
+## Ghid de rulare
+### 1. Instalare dependete
+- in bash in directorul backend de rulat npm install
+
+### 2. Start la server
+- de rulat npm run dev
+
+### 3. Testare endpoints
+- Ordinea de creare recomandata (din cauza relatiilor între tabele):
+1. Participant
+2. Event
+3. Attendance (are nevoie de participant si event existente)
+
+- Exemple 
+
+<pre>
+json { "name": "Noul Eveniment", "startTime": "2025-12-10T09:00:00.000Z", "endTime": "2025-12-10T11:00:00.000Z", "maxParticipants": 100, "description": "Eveniment test", "eventType": "Workshop" }
+</pre>
+<pre>
+json { 
+  "name": "John Doe", 
+  "email": "john@example.com" 
+}
+</pre>
+<pre>
+json { 
+  "eventId": 1, 
+  "participantId": 1, 
+  "status": "PRESENT" 
+}
+</pre>
+
+
+#### Event Endpoints
+- GET http://localhost:5000/events/ – lista evenimentelor
+
+
+- POST http://localhost:5000/events/ – creeaza un eveniment
+
+
+- GET http://localhost:5000/events/:id – detalii eveniment
+
+
+- PUT http://localhost:5000/events/:id – actualizare eveniment
+
+
+- DELETE http://localhost:5000/events/:id – stergere eveniment
+
+
+#### Participant Endpoints
+- GET http://localhost:5000/participants/ – lista participanților
+
+
+- POST http://localhost:5000/participants/ – creeaza participant
+
+
+- GET http://localhost:5000/participants/:id – detalii participant
+
+
+- PUT http://localhost:5000/participants/:id – actualizare participant
+
+
+- DELETE http://localhost:5000/participants/:id – stergere participant
+
+
+#### Attendance Endpoints
+- GET http://localhost:5000/attendance/ – lista prezentelor
+
+
+- POST http://localhost:5000/attendance/ – creeaza prezenta
+
+
+- GET http://localhost:5000/attendance/:id – detalii prezenta
+
+
+- PUT http://localhost:5000/attendance/:id – actualizare prezenta
+
+
+- DELETE http://localhost:5000/attendance/:id – stergere prezenta
+
+
+
+
 ## 📌 1. Tehnologii
 
 ###  Front-end
@@ -11,7 +94,7 @@
 
 ###  Back-end
 - **Node.js**
-- **Prisma ORM**
+- **Sequelize ORM**
 - **MySQL**
 
 ---
