@@ -1,0 +1,110 @@
+/* Adaugă la sfârșitul fișierului CSS existent */
+
+/* Student-specific styles */
+.student-info-message {
+  background: #e6fffa;
+  border: 1px solid #81e6d9;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.student-info-message p {
+  margin-bottom: 0.5rem;
+  color: #234e52;
+}
+
+.student-info-message ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.student-info-message li {
+  margin-bottom: 0.5rem;
+  color: #234e52;
+}
+
+.student-guide {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-top: 2rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.student-guide h3 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #2d3748;
+}
+
+.guide-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.guide-step {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  background: #4299e1;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin: 0 auto 1rem;
+  font-size: 1.2rem;
+}
+
+.step-content h4 {
+  margin-bottom: 0.5rem;
+  color: #2d3748;
+}
+
+.step-content p {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments for student view */
+@media (max-width: 768px) {
+  .guide-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Event details styling */
+.event-details {
+  margin-top: 0.25rem;
+}
+
+.event-location {
+  font-size: 0.85rem;
+  color: #718096;
+  margin-top: 0.1rem;
+}
+
+/* Hide create button for students */
+.student-view .create-button {
+  display: none;
+}
+
+/* Adjust table for student view */
+.attendance-table.student-view th:nth-child(3),
+.attendance-table.student-view td:nth-child(3) {
+  display: none;
+}
