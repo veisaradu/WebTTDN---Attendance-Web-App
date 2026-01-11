@@ -11,3 +11,5 @@ const Attendance = sequelize.define("Attendance", {
 });
 
 module.exports = Attendance;
+
+//blah b;ah
