@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/Events.css";
-import ExportButton from '../components/ExportButton';
+import ExportButton from "../components/ExportButton";
 
 export default function EventsPage() {
   const [events, setEvents] = useState([]);
@@ -11,18 +11,25 @@ export default function EventsPage() {
   const [joinCode, setJoinCode] = useState("");
   const [joinError, setJoinError] = useState("");
   const [editingEvent, setEditingEvent] = useState(null);
+  const [viewingParticipants, setViewingParticipants] = useState(null);
+  const [participantsList, setParticipantsList] = useState([]);
+  const [loadingParticipants, setLoadingParticipants] = useState(false);
+  const [showAddManualModal, setShowAddManualModal] = useState(false);
+  const [allStudents, setAllStudents] = useState([]);
+  const [selectedEventId, setSelectedEventId] = useState(null);
+  const [searchStudent, setSearchStudent] = useState("");
   const [formData, setFormData] = useState({
-    name: '',
-    startTime: '',
-    endTime: '',
+    name: "",
+    startTime: "",
+    endTime: "",
     maxParticipants: 50,
-    description: '',
-    eventType: 'Workshop',
-    status: 'CLOSED'
+    description: "",
+    eventType: "Workshop",
+    status: "CLOSED",
   });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('ALL');
-  const [filterStatus, setFilterStatus] = useState('ALL');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("ALL");
+  const [filterStatus, setFilterStatus] = useState("ALL");
   const { token, isProfessor, user } = useAuth();
 
   useEffect(() => {
@@ -33,17 +40,17 @@ export default function EventsPage() {
     try {
       const response = await fetch("http://localhost:5000/events", {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       if (!response.ok) {
         console.error("HTTP error:", response.status, response.statusText);
         setEvents([]);
         setLoading(false);
         return;
       }
-      
+
       // Verifică dacă răspunsul este JSON valid
       const text = await response.text();
       if (!text) {
@@ -51,7 +58,7 @@ export default function EventsPage() {
         setLoading(false);
         return;
       }
-      
+
       const data = JSON.parse(text);
       setEvents(data || []);
     } catch (error) {
@@ -63,24 +70,40 @@ export default function EventsPage() {
   };
 
   // Filtrare evenimente
-  const filteredEvents = events.filter(event => {
-    const matchesSearch = event.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                       (event.description && event.description.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesType = filterType === 'ALL' || event.eventType === filterType;
-    const matchesStatus = filterStatus === 'ALL' || event.status === filterStatus;
-    
+  const filteredEvents = events.filter((event) => {
+    const matchesSearch =
+      event.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (event.description &&
+        event.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesType = filterType === "ALL" || event.eventType === filterType;
+    const matchesStatus =
+      filterStatus === "ALL" || event.status === filterStatus;
+
     return matchesSearch && matchesType && matchesStatus;
   });
 
   // Obține tipuri unice pentru filtru
-  const eventTypes = ['ALL', ...new Set(events.map(e => e.eventType).filter(Boolean))];
-  const eventStatuses = ['ALL', 'OPEN', 'CLOSED', 'FULL'];
+  const standardTypes = [
+    "Workshop",
+    "Lecture",
+    "Seminar",
+    "Meeting",
+    "Conference",
+  ];
+  const eventTypes = [
+    "ALL",
+    ...new Set([
+      ...standardTypes,
+      ...events.map((e) => e.eventType).filter(Boolean),
+    ]),
+  ];
+  const eventStatuses = ["ALL", "OPEN", "CLOSED", "FULL"];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -88,34 +111,36 @@ export default function EventsPage() {
   const handleJoinEvent = async (e) => {
     e.preventDefault();
     setJoinError("");
-    
+
     if (!joinCode.trim()) {
       setJoinError("Please enter a code");
       return;
     }
-    
+
     if (!user || !user.id) {
       setJoinError("You must be logged in to join events");
       return;
     }
-    
+
     try {
       const response = await fetch("http://localhost:5000/event-join/join", {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           textCode: joinCode.toUpperCase().trim(),
-          participantId: user.id
-        })
+          participantId: user.id,
+        }),
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
-        alert(`✅ Successfully joined event: ${data.event?.name || 'the event'}`);
+        alert(
+          `✅ Successfully joined event: ${data.event?.name || "the event"}`
+        );
         setShowJoinModal(false);
         setJoinCode("");
         fetchEvents();
@@ -134,28 +159,28 @@ export default function EventsPage() {
       const response = await fetch("http://localhost:5000/events", {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           ...formData,
           startTime: new Date(formData.startTime).toISOString(),
-          endTime: new Date(formData.endTime).toISOString()
-        })
+          endTime: new Date(formData.endTime).toISOString(),
+        }),
       });
-      
+
       if (response.ok) {
         setShowCreateModal(false);
         resetForm();
         fetchEvents();
-        alert('Event created successfully!');
+        alert("Event created successfully!");
       } else {
         const errorData = await response.json().catch(() => ({}));
-        alert(`Failed to create event: ${errorData.error || 'Unknown error'}`);
+        alert(`Failed to create event: ${errorData.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error creating event:", error);
-      alert('Failed to create event');
+      alert("Failed to create event");
     }
   };
 
@@ -163,12 +188,12 @@ export default function EventsPage() {
     setEditingEvent(event);
     setFormData({
       name: event.name,
-      startTime: event.startTime ? event.startTime.slice(0, 16) : '',
-      endTime: event.endTime ? event.endTime.slice(0, 16) : '',
+      startTime: event.startTime ? event.startTime.slice(0, 16) : "",
+      endTime: event.endTime ? event.endTime.slice(0, 16) : "",
       maxParticipants: event.maxParticipants || 50,
-      description: event.description || '',
-      eventType: event.eventType || 'Workshop',
-      status: event.status || 'CLOSED'
+      description: event.description || "",
+      eventType: event.eventType || "Workshop",
+      status: event.status || "CLOSED",
     });
     setShowCreateModal(true);
   };
@@ -176,69 +201,180 @@ export default function EventsPage() {
   const handleUpdateEvent = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:5000/events/${editingEvent.id}`, {
-        method: "PUT",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          ...formData,
-          startTime: new Date(formData.startTime).toISOString(),
-          endTime: new Date(formData.endTime).toISOString()
-        })
-      });
-      
+      const response = await fetch(
+        `http://localhost:5000/events/${editingEvent.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ...formData,
+            startTime: new Date(formData.startTime).toISOString(),
+            endTime: new Date(formData.endTime).toISOString(),
+          }),
+        }
+      );
+
       if (response.ok) {
         setShowCreateModal(false);
         setEditingEvent(null);
         resetForm();
         fetchEvents();
-        alert('Event updated successfully!');
+        alert("Event updated successfully!");
       } else {
         const errorData = await response.json().catch(() => ({}));
-        alert(`Failed to update event: ${errorData.error || 'Unknown error'}`);
+        alert(`Failed to update event: ${errorData.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error updating event:", error);
-      alert('Failed to update event');
+      alert("Failed to update event");
     }
   };
 
   const handleDeleteEvent = async (eventId) => {
-    if (window.confirm("Are you sure you want to delete this event? This will also delete all attendance records for this event.")) {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this event? This will also delete all attendance records for this event."
+      )
+    ) {
       try {
-        const response = await fetch(`http://localhost:5000/events/${eventId}`, {
-          method: "DELETE",
-          headers: {
-            'Authorization': `Bearer ${token}`
+        const response = await fetch(
+          `http://localhost:5000/events/${eventId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
-        
+        );
+
         if (response.ok) {
           fetchEvents();
-          alert('Event deleted successfully!');
+          alert("Event deleted successfully!");
         } else {
           const errorData = await response.json().catch(() => ({}));
-          alert(`Failed to delete event: ${errorData.error || 'Unknown error'}`);
+          alert(
+            `Failed to delete event: ${errorData.error || "Unknown error"}`
+          );
         }
       } catch (error) {
         console.error("Error deleting event:", error);
-        alert('Failed to delete event');
+        alert("Failed to delete event");
       }
     }
   };
 
   const resetForm = () => {
     setFormData({
-      name: '',
-      startTime: '',
-      endTime: '',
+      name: "",
+      startTime: "",
+      endTime: "",
       maxParticipants: 50,
-      description: '',
-      eventType: 'Workshop',
-      status: 'CLOSED'
+      description: "",
+      eventType: "Workshop",
+      status: "CLOSED",
     });
+  };
+
+  const handleViewParticipants = async (eventId) => {
+    setLoadingParticipants(true);
+    try {
+      const response = await fetch(`http://localhost:5000/events/${eventId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setViewingParticipants(data);
+      setParticipantsList(data.Attendances || []);
+    } catch (error) {
+      console.error("Error fetching participants:", error);
+      alert("Could not load participants list");
+    } finally {
+      setLoadingParticipants(false);
+    }
+  };
+
+  const handleStatusChange = async (attendanceId, newStatus) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/attendance/${attendanceId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+
+      if (response.ok) {
+        setParticipantsList((prevList) =>
+          prevList.map((att) =>
+            att.id === attendanceId ? { ...att, status: newStatus } : att
+          )
+        );
+      } else {
+        alert("Eroare la actualizarea statusului.");
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Problemă de rețea la actualizarea statusului.");
+    }
+  };
+
+  const openAddManualModal = async (eventId) => {
+    setSelectedEventId(eventId);
+    setShowAddManualModal(true);
+    try {
+      const response = await fetch("http://localhost:5000/participants", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      // Filtrăm pentru a afișa doar studenții
+      setAllStudents(data.filter((p) => p.role === "STUDENT") || []);
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    }
+  };
+
+  const handleAddStudentToEvent = async (studentId) => {
+    try {
+      const response = await fetch("http://localhost:5000/attendance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          eventId: selectedEventId,
+          participantId: studentId,
+          status: "PRESENT",
+        }),
+      });
+
+      if (response.ok) {
+        setEvents((prevEvents) =>
+          prevEvents.map((ev) =>
+            ev.id === selectedEventId
+              ? {
+                  ...ev,
+                  currentParticipants: (ev.currentParticipants || 0) + 1,
+                }
+              : ev
+          )
+        );
+
+        alert("Student adăugat cu succes!");
+        fetchEvents();
+      } else {
+        const data = await response.json();
+        alert(data.error || "Eroare la adăugare.");
+      }
+    } catch (error) {
+      console.error("Error adding student:", error);
+    }
   };
 
   if (loading) {
@@ -252,19 +388,16 @@ export default function EventsPage() {
           <h2 className="page-title">Events</h2>
           <p className="page-subtitle">Manage and track all events</p>
         </div>
-        
+
         <div className="header-actions">
           {!isProfessor() && (
-            <button 
-              className="btn-join"
-              onClick={() => setShowJoinModal(true)}
-            >
+            <button className="btn-join" onClick={() => setShowJoinModal(true)}>
               🔗 Join Event
             </button>
           )}
-          
+
           {isProfessor() && (
-            <button 
+            <button
               className="btn-create"
               onClick={() => setShowCreateModal(true)}
             >
@@ -287,28 +420,28 @@ export default function EventsPage() {
           />
           <span className="search-icon">🔍</span>
         </div>
-        
+
         <div className="filter-options">
-          <select 
-            value={filterType} 
+          <select
+            value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
             className="filter-select"
           >
-            {eventTypes.map(type => (
+            {eventTypes.map((type) => (
               <option key={type} value={type}>
-                {type === 'ALL' ? 'All Types' : type}
+                {type === "ALL" ? "All Types" : type}
               </option>
             ))}
           </select>
-          
-          <select 
-            value={filterStatus} 
+
+          <select
+            value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="filter-select"
           >
-            {eventStatuses.map(status => (
+            {eventStatuses.map((status) => (
               <option key={status} value={status}>
-                {status === 'ALL' ? 'All Statuses' : status}
+                {status === "ALL" ? "All Statuses" : status}
               </option>
             ))}
           </select>
@@ -328,7 +461,7 @@ export default function EventsPage() {
           <div className="summary-icon active">🔴</div>
           <div className="summary-content">
             <div className="summary-value">
-              {events.filter(e => e.status === 'OPEN').length}
+              {events.filter((e) => e.status === "OPEN").length}
             </div>
             <div className="summary-label">Active</div>
           </div>
@@ -337,7 +470,7 @@ export default function EventsPage() {
           <div className="summary-icon upcoming">⏰</div>
           <div className="summary-content">
             <div className="summary-value">
-              {events.filter(e => new Date(e.startTime) > new Date()).length}
+              {events.filter((e) => new Date(e.startTime) > new Date()).length}
             </div>
             <div className="summary-label">Upcoming</div>
           </div>
@@ -346,7 +479,11 @@ export default function EventsPage() {
           <div className="summary-icon closed">✅</div>
           <div className="summary-content">
             <div className="summary-value">
-              {events.filter(e => e.status === 'CLOSED' || e.status === 'FULL').length}
+              {
+                events.filter(
+                  (e) => e.status === "CLOSED" || e.status === "FULL"
+                ).length
+              }
             </div>
             <div className="summary-label">Completed/Full</div>
           </div>
@@ -357,23 +494,31 @@ export default function EventsPage() {
       <div className="events-table-container">
         {filteredEvents.length > 0 ? (
           <div className="events-grid">
-            {filteredEvents.map(event => {
+            {filteredEvents.map((event) => {
               const startDate = new Date(event.startTime);
               const endDate = new Date(event.endTime);
               const now = new Date();
               const isUpcoming = startDate > now;
-              const isActive = event.status === 'OPEN';
-              const isFull = event.status === 'FULL';
+              const isActive = event.status === "OPEN";
+              const isFull = event.status === "FULL";
               const isRunning = now >= startDate && now <= endDate;
               const hasEnded = now > endDate;
-              
+
               return (
                 <div key={event.id} className="event-card">
                   <div className="event-card-header">
                     <h3 className="event-title">{event.name}</h3>
                     <div className="status-container">
-                      <span className={`event-status-badge status-${event.status?.toLowerCase() || 'closed'}`}>
-                        {isFull ? 'FULL' : isUpcoming && isActive ? 'UPCOMING' : event.status || 'CLOSED'}
+                      <span
+                        className={`event-status-badge status-${
+                          event.status?.toLowerCase() || "closed"
+                        }`}
+                      >
+                        {isFull
+                          ? "FULL"
+                          : isUpcoming && isActive
+                          ? "UPCOMING"
+                          : event.status || "CLOSED"}
                       </span>
                       {isRunning && (
                         <span className="time-indicator running">▶️ LIVE</span>
@@ -383,11 +528,11 @@ export default function EventsPage() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="event-description">
-                    {event.description || 'No description provided'}
+                    {event.description || "No description provided"}
                   </div>
-                  
+
                   <div className="event-details">
                     <div className="detail-item">
                       <span className="detail-label">📅 Date:</span>
@@ -398,35 +543,44 @@ export default function EventsPage() {
                     <div className="detail-item">
                       <span className="detail-label">⏰ Time:</span>
                       <span className="detail-value">
-                        {startDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - 
-                        {endDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        {startDate.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}{" "}
+                        -
+                        {endDate.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </span>
                     </div>
                     <div className="detail-item">
                       <span className="detail-label">🏷️ Type:</span>
                       <span className="detail-value type-badge">
-                        {event.eventType || 'General'}
+                        {event.eventType || "General"}
                       </span>
                     </div>
                     <div className="detail-item">
                       <span className="detail-label">👥 Participants:</span>
                       <span className="detail-value">
-                        <span className="current-participants">{event.currentParticipants || 0}</span>
+                        <span className="current-participants">
+                          {event.currentParticipants || 0}
+                        </span>
                         <span className="capacity-separator">/</span>
                         <span className="max-participants">
-                          {event.maxParticipants || '∞'}
+                          {event.maxParticipants || "∞"}
                         </span>
                         {isFull && <span className="full-badge"> FULL</span>}
                       </span>
                     </div>
-                    
+
                     {/* Afișează codul text pentru profesori */}
                     {isProfessor() && event.textCode && (
                       <div className="detail-item">
                         <span className="detail-label">🔑 Join Code:</span>
                         <span className="detail-value code-display">
                           <span className="code-text">{event.textCode}</span>
-                          <button 
+                          <button
                             className="btn-copy-code"
                             onClick={() => {
                               navigator.clipboard.writeText(event.textCode);
@@ -440,18 +594,31 @@ export default function EventsPage() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="event-card-footer">
                     {isProfessor() ? (
                       <div className="event-actions">
+                        <button
+                          className="btn-add-manual"
+                          onClick={() => openAddManualModal(event.id)}
+                          title="Adaugă student manual"
+                        >
+                          ➕
+                        </button>
+                        <button
+                          className="btn-view"
+                          onClick={() => handleViewParticipants(event.id)}
+                        >
+                          👁️ Vezi Participanți
+                        </button>
                         <ExportButton type="event" id={event.id} />
-                        <button 
+                        <button
                           className="btn-edit"
                           onClick={() => handleEditEvent(event)}
                         >
                           ✏️ Edit
                         </button>
-                        <button 
+                        <button
                           className="btn-delete"
                           onClick={() => handleDeleteEvent(event.id)}
                         >
@@ -460,7 +627,7 @@ export default function EventsPage() {
                       </div>
                     ) : (
                       <div className="student-actions">
-                        {!hasEnded && event.status === 'OPEN' && !isFull && (
+                        {!hasEnded && event.status === "OPEN" && !isFull && (
                           <span className="join-hint">
                             Ask the professor for the join code
                           </span>
@@ -468,8 +635,10 @@ export default function EventsPage() {
                         {isFull && (
                           <span className="full-message">Event is full</span>
                         )}
-                        {(event.status === 'CLOSED' || hasEnded) && (
-                          <span className="closed-message">Registration closed</span>
+                        {(event.status === "CLOSED" || hasEnded) && (
+                          <span className="closed-message">
+                            Registration closed
+                          </span>
                         )}
                       </div>
                     )}
@@ -482,18 +651,22 @@ export default function EventsPage() {
           <div className="empty-state">
             <div className="empty-icon">📅</div>
             <h4>No events found</h4>
-            <p>{searchTerm || filterType !== 'ALL' || filterStatus !== 'ALL' 
-              ? 'Try changing your search or filters' 
-              : 'Create your first event to get started'}
+            <p>
+              {searchTerm || filterType !== "ALL" || filterStatus !== "ALL"
+                ? "Try changing your search or filters"
+                : "Create your first event to get started"}
             </p>
-            {isProfessor() && !searchTerm && filterType === 'ALL' && filterStatus === 'ALL' && (
-              <button 
-                className="btn-create"
-                onClick={() => setShowCreateModal(true)}
-              >
-                Create Event
-              </button>
-            )}
+            {isProfessor() &&
+              !searchTerm &&
+              filterType === "ALL" &&
+              filterStatus === "ALL" && (
+                <button
+                  className="btn-create"
+                  onClick={() => setShowCreateModal(true)}
+                >
+                  Create Event
+                </button>
+              )}
           </div>
         )}
       </div>
@@ -503,9 +676,9 @@ export default function EventsPage() {
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
-              <h3>{editingEvent ? 'Edit Event' : 'Create New Event'}</h3>
-              <button 
-                className="modal-close" 
+              <h3>{editingEvent ? "Edit Event" : "Create New Event"}</h3>
+              <button
+                className="modal-close"
                 onClick={() => {
                   setShowCreateModal(false);
                   setEditingEvent(null);
@@ -515,7 +688,9 @@ export default function EventsPage() {
                 ×
               </button>
             </div>
-            <form onSubmit={editingEvent ? handleUpdateEvent : handleCreateEvent}>
+            <form
+              onSubmit={editingEvent ? handleUpdateEvent : handleCreateEvent}
+            >
               <div className="modal-body">
                 <div className="form-group">
                   <label>Event Name *</label>
@@ -529,7 +704,7 @@ export default function EventsPage() {
                     className="form-input"
                   />
                 </div>
-                
+
                 <div className="form-row">
                   <div className="form-group">
                     <label>Start Time *</label>
@@ -542,7 +717,7 @@ export default function EventsPage() {
                       className="form-input"
                     />
                   </div>
-                  
+
                   <div className="form-group">
                     <label>End Time *</label>
                     <input
@@ -555,7 +730,7 @@ export default function EventsPage() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="form-row">
                   <div className="form-group">
                     <label>Event Type</label>
@@ -572,7 +747,7 @@ export default function EventsPage() {
                       <option value="Conference">Conference</option>
                     </select>
                   </div>
-                  
+
                   <div className="form-group">
                     <label>Max Participants</label>
                     <input
@@ -586,7 +761,7 @@ export default function EventsPage() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="form-group">
                   <label>Status</label>
                   <select
@@ -599,7 +774,7 @@ export default function EventsPage() {
                     <option value="OPEN">OPEN</option>
                   </select>
                 </div>
-                
+
                 <div className="form-group">
                   <label>Description</label>
                   <textarea
@@ -613,7 +788,7 @@ export default function EventsPage() {
                 </div>
               </div>
               <div className="modal-footer">
-                <button 
+                <button
                   type="button"
                   className="btn-secondary"
                   onClick={() => {
@@ -624,11 +799,8 @@ export default function EventsPage() {
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit"
-                  className="btn-primary"
-                >
-                  {editingEvent ? 'Update Event' : 'Create Event'}
+                <button type="submit" className="btn-primary">
+                  {editingEvent ? "Update Event" : "Create Event"}
                 </button>
               </div>
             </form>
@@ -642,8 +814,8 @@ export default function EventsPage() {
           <div className="modal">
             <div className="modal-header">
               <h3>Join Event</h3>
-              <button 
-                className="modal-close" 
+              <button
+                className="modal-close"
                 onClick={() => {
                   setShowJoinModal(false);
                   setJoinCode("");
@@ -653,7 +825,7 @@ export default function EventsPage() {
                 ×
               </button>
             </div>
-            
+
             <form onSubmit={handleJoinEvent}>
               <div className="modal-body">
                 <div className="form-group">
@@ -670,18 +842,14 @@ export default function EventsPage() {
                     autoFocus
                   />
                   {joinError && (
-                    <div className="error-message">
-                      ❌ {joinError}
-                    </div>
+                    <div className="error-message">❌ {joinError}</div>
                   )}
-                  <p className="form-hint">
-                    Get the code from your professor
-                  </p>
+                  <p className="form-hint">Get the code from your professor</p>
                 </div>
               </div>
-              
+
               <div className="modal-footer">
-                <button 
+                <button
                   type="button"
                   className="btn-secondary"
                   onClick={() => {
@@ -692,7 +860,7 @@ export default function EventsPage() {
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   type="submit"
                   className="btn-primary"
                   disabled={!joinCode.trim()}
@@ -701,6 +869,132 @@ export default function EventsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {viewingParticipants && (
+        <div className="modal-overlay">
+          <div
+            className="modal participants-modal"
+            style={{ maxWidth: "800px" }}
+          >
+            <div className="modal-header">
+              <h3>Lista Prezență: {viewingParticipants.name}</h3>
+              <button
+                className="modal-close"
+                onClick={() => setViewingParticipants(null)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              {participantsList.length > 0 ? (
+                <table className="participants-table">
+                  <thead>
+                    <tr>
+                      <th>Nume</th>
+                      <th>Email</th>
+                      <th>Oră Înregistrare</th>
+                      <th>Status</th> {/* Secțiune nouă */}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {participantsList.map((att) => (
+                      <tr key={att.id}>
+                        <td>{att.Participant?.name}</td>
+                        <td>{att.Participant?.email}</td>
+                        <td>
+                          {att.createdAt
+                            ? new Date(att.createdAt).toLocaleTimeString()
+                            : "N/A"}
+                        </td>
+                        <td>
+                          <select
+                            value={att.status}
+                            onChange={(e) =>
+                              handleStatusChange(att.id, e.target.value)
+                            }
+                            className={`status-select status-${att.status?.toLowerCase()}`}
+                          >
+                            <option value="PRESENT">✅ Prezent</option>
+                            <option value="ABSENT">❌ Absent</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="empty-message">Nu s-a înscris nimeni încă.</p>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn-secondary"
+                onClick={() => setViewingParticipants(null)}
+              >
+                Închide
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showAddManualModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h3>Adaugă Student Manual</h3>
+              <button
+                className="modal-close"
+                onClick={() => setShowAddManualModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <input
+                type="text"
+                placeholder="Caută student după nume..."
+                className="form-input"
+                value={searchStudent}
+                onChange={(e) => setSearchStudent(e.target.value)}
+              />
+              <div
+                className="students-list-manual"
+                style={{
+                  maxHeight: "300px",
+                  overflowY: "auto",
+                  marginTop: "15px",
+                }}
+              >
+                {allStudents
+                  .filter((s) =>
+                    s.name.toLowerCase().includes(searchStudent.toLowerCase())
+                  )
+                  .map((student) => (
+                    <div
+                      key={student.id}
+                      className="student-manual-item"
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        padding: "10px",
+                        borderBottom: "1px solid #eee",
+                      }}
+                    >
+                      <span>
+                        {student.name} ({student.email})
+                      </span>
+                      <button
+                        className="btn-primary btn-sm"
+                        onClick={() => handleAddStudentToEvent(student.id)}
+                      >
+                        Adaugă
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </div>
           </div>
         </div>
       )}

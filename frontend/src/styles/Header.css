@@ -93,3 +93,24 @@
 .btn-logout:hover {
   background: rgba(255, 255, 255, 0.2);
 }
+
+.participants-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+.participants-table th,
+.participants-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+.btn-view {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 5px;
+}

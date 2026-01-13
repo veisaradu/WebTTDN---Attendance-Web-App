@@ -512,7 +512,8 @@
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .modal-header {
@@ -686,59 +687,83 @@
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .header-actions {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .btn-join,
   .btn-create {
     width: 100%;
     justify-content: center;
   }
-  
+
   .filters-container {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .search-box {
     max-width: 100%;
   }
-  
+
   .filter-options {
     width: 100%;
   }
-  
+
   .filter-select {
     flex: 1;
   }
-  
+
   .events-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .event-card {
     padding: 1rem;
   }
-  
+
   .event-actions {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .modal {
     width: 95%;
     margin: 1rem;
   }
-  
+
   .form-row {
     grid-template-columns: 1fr;
   }
-  
+
   .status-container {
     align-items: flex-start;
     gap: 0.5rem;
   }
+}
+
+.student-manual-item {
+  color: #2d3748;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  align-items: center;
+}
+
+.student-manual-item:hover {
+  background-color: #f7fafc;
+  color: #1a202c;
+}
+
+.student-manual-item span {
+  font-weight: 500;
+}
+
+.modal-body .form-input {
+  color: #2d3748;
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
 }

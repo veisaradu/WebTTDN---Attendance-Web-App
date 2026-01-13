@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Event } = require("../models");
+const { Event, Attendance, Participant } = require("../models");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -22,7 +22,19 @@ router.post("/", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const event = await Event.findByPk(req.params.id);
+    const event = await Event.findByPk(req.params.id, {
+      include: [
+        {
+          model: Attendance,
+          include: [
+            {
+              model: Participant,
+              attributes: ["id", "name", "email"],
+            },
+          ],
+        },
+      ],
+    });
     event ? res.json(event) : res.sendStatus(404);
   } catch (e) {
     next(e);
