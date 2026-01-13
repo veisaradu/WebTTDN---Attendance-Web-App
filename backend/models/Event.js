@@ -3,7 +3,14 @@ const sequelize = require("../sequelize");
 
 const Event = sequelize.define("Event", {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  groupId: DataTypes.INTEGER,
+  groupId: { 
+    type: DataTypes.INTEGER,
+    references: {
+      model: 'EventGroups',
+      key: 'id'
+    },
+    allowNull: true 
+  },
   name: DataTypes.STRING,
   status: { type: DataTypes.STRING, defaultValue: "CLOSED" },
   startTime: DataTypes.DATE,
