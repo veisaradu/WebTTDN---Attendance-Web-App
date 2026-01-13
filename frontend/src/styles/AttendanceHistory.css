@@ -1,0 +1,182 @@
+
+.attendance-container {
+    padding: 2.5rem;
+    max-width: 1100px;
+    margin: 40px auto;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.history-header {
+    border-bottom: 3px solid #e2e8f0;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+}
+
+
+.history-title {
+    color: #116ae7; 
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    opacity: 1; 
+    letter-spacing: -0.5px;
+}
+
+.history-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+}
+
+.history-table th {
+    text-align: left;
+    padding: 1.2rem;
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 700;
+    border-bottom: 2px solid #cbd5e1;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.history-table td {
+    padding: 1.2rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    font-size: 1rem;
+}
+
+.event-name {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.history-table tr:hover {
+    background-color: #f8fafc;
+}
+
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.status-present {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.status-absent {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.loading-state, .no-data {
+    text-align: center;
+    padding: 3rem;
+    color: #64748b;
+    font-size: 1.2rem;
+    font-weight: 500;
+}.professor-card {
+    padding: 0; /* Reset padding pentru a controla interiorul */
+    overflow: hidden;
+}
+
+.professor-card .history-card-header {
+    background-color: #f8fafc;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.event-date {
+    display: block;
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.stats-pill {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.participants-section {
+    padding: 0;
+    overflow-x: auto;
+}
+
+/* TABLE STYLING */
+.participants-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.participants-table th {
+    background-color: #ffffff;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 12px 24px;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.participants-table td {
+    padding: 12px 24px;
+    border-bottom: 1px solid #f8fafc;
+    color: #334155;
+    vertical-align: middle;
+}
+
+.participants-table tr:last-child td {
+    border-bottom: none;
+}
+
+.participants-table tr:hover {
+    background-color: #f8fafc;
+}
+
+.participants-table .text-muted {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.participants-table .fw-bold {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.time-cell {
+    font-family: 'Courier New', Courier, monospace;
+    color: #475569;
+}
+
+.no-participants {
+    padding: 2rem;
+    text-align: center;
+    color: #94a3b8;
+    font-style: italic;
+}

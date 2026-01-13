@@ -2,8 +2,15 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../sequelize");
 
 const EventGroup = sequelize.define("EventGroup", {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  name: DataTypes.STRING,
+  id: { 
+    type: DataTypes.INTEGER, 
+    autoIncrement: true, 
+    primaryKey: true 
+  },
+  name: { 
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   description: DataTypes.STRING,
   recurrencePattern: DataTypes.STRING, 
   recurrenceDays: DataTypes.STRING, 
@@ -13,6 +20,9 @@ const EventGroup = sequelize.define("EventGroup", {
   eventDuration: DataTypes.INTEGER,
   maxParticipants: DataTypes.INTEGER,
   eventType: DataTypes.STRING,
+}, {
+  tableName: 'event_groups',
+  timestamps: true
 });
 
 module.exports = EventGroup;

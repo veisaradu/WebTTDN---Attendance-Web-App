@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/Events.css";
+import ExportButton from '../components/ExportButton';
 
 export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [joinCode, setJoinCode] = useState("");
+  const [joinError, setJoinError] = useState("");
   const [editingEvent, setEditingEvent] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -32,10 +36,27 @@ export default function EventsPage() {
           'Authorization': `Bearer ${token}`
         }
       });
-      const data = await response.json();
+      
+      if (!response.ok) {
+        console.error("HTTP error:", response.status, response.statusText);
+        setEvents([]);
+        setLoading(false);
+        return;
+      }
+      
+      // Verifică dacă răspunsul este JSON valid
+      const text = await response.text();
+      if (!text) {
+        setEvents([]);
+        setLoading(false);
+        return;
+      }
+      
+      const data = JSON.parse(text);
       setEvents(data || []);
     } catch (error) {
       console.error("Error fetching events:", error);
+      setEvents([]);
     } finally {
       setLoading(false);
     }
@@ -43,8 +64,8 @@ export default function EventsPage() {
 
   // Filtrare evenimente
   const filteredEvents = events.filter(event => {
-    const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (event.description && event.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = event.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       (event.description && event.description.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesType = filterType === 'ALL' || event.eventType === filterType;
     const matchesStatus = filterStatus === 'ALL' || event.status === filterStatus;
     
@@ -53,7 +74,7 @@ export default function EventsPage() {
 
   // Obține tipuri unice pentru filtru
   const eventTypes = ['ALL', ...new Set(events.map(e => e.eventType).filter(Boolean))];
-  const eventStatuses = ['ALL', 'OPEN', 'CLOSED'];
+  const eventStatuses = ['ALL', 'OPEN', 'CLOSED', 'FULL'];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -61,6 +82,50 @@ export default function EventsPage() {
       ...formData,
       [name]: value
     });
+  };
+
+  // Funcție pentru join la eveniment
+  const handleJoinEvent = async (e) => {
+    e.preventDefault();
+    setJoinError("");
+    
+    if (!joinCode.trim()) {
+      setJoinError("Please enter a code");
+      return;
+    }
+    
+    if (!user || !user.id) {
+      setJoinError("You must be logged in to join events");
+      return;
+    }
+    
+    try {
+      const response = await fetch("http://localhost:5000/event-join/join", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          textCode: joinCode.toUpperCase().trim(),
+          participantId: user.id
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert(`✅ Successfully joined event: ${data.event?.name || 'the event'}`);
+        setShowJoinModal(false);
+        setJoinCode("");
+        fetchEvents();
+      } else {
+        setJoinError(data.error || "Failed to join event");
+      }
+    } catch (error) {
+      console.error("Error joining event:", error);
+      setJoinError("Network error. Please try again.");
+    }
   };
 
   const handleCreateEvent = async (e) => {
@@ -84,6 +149,9 @@ export default function EventsPage() {
         resetForm();
         fetchEvents();
         alert('Event created successfully!');
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        alert(`Failed to create event: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error creating event:", error);
@@ -127,6 +195,9 @@ export default function EventsPage() {
         resetForm();
         fetchEvents();
         alert('Event updated successfully!');
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        alert(`Failed to update event: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error updating event:", error);
@@ -135,7 +206,7 @@ export default function EventsPage() {
   };
 
   const handleDeleteEvent = async (eventId) => {
-    if (window.confirm("Are you sure you want to delete this event?")) {
+    if (window.confirm("Are you sure you want to delete this event? This will also delete all attendance records for this event.")) {
       try {
         const response = await fetch(`http://localhost:5000/events/${eventId}`, {
           method: "DELETE",
@@ -147,6 +218,9 @@ export default function EventsPage() {
         if (response.ok) {
           fetchEvents();
           alert('Event deleted successfully!');
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          alert(`Failed to delete event: ${errorData.error || 'Unknown error'}`);
         }
       } catch (error) {
         console.error("Error deleting event:", error);
@@ -177,6 +251,27 @@ export default function EventsPage() {
         <div>
           <h2 className="page-title">Events</h2>
           <p className="page-subtitle">Manage and track all events</p>
+        </div>
+        
+        <div className="header-actions">
+          {!isProfessor() && (
+            <button 
+              className="btn-join"
+              onClick={() => setShowJoinModal(true)}
+            >
+              🔗 Join Event
+            </button>
+          )}
+          
+          {isProfessor() && (
+            <button 
+              className="btn-create"
+              onClick={() => setShowCreateModal(true)}
+            >
+              <span className="btn-icon">+</span>
+              Create Event
+            </button>
+          )}
         </div>
       </div>
 
@@ -251,9 +346,9 @@ export default function EventsPage() {
           <div className="summary-icon closed">✅</div>
           <div className="summary-content">
             <div className="summary-value">
-              {events.filter(e => e.status === 'CLOSED').length}
+              {events.filter(e => e.status === 'CLOSED' || e.status === 'FULL').length}
             </div>
-            <div className="summary-label">Completed</div>
+            <div className="summary-label">Completed/Full</div>
           </div>
         </div>
       </div>
@@ -265,16 +360,28 @@ export default function EventsPage() {
             {filteredEvents.map(event => {
               const startDate = new Date(event.startTime);
               const endDate = new Date(event.endTime);
-              const isUpcoming = startDate > new Date();
+              const now = new Date();
+              const isUpcoming = startDate > now;
               const isActive = event.status === 'OPEN';
+              const isFull = event.status === 'FULL';
+              const isRunning = now >= startDate && now <= endDate;
+              const hasEnded = now > endDate;
               
               return (
                 <div key={event.id} className="event-card">
                   <div className="event-card-header">
                     <h3 className="event-title">{event.name}</h3>
-                    <span className={`event-status-badge status-${event.status?.toLowerCase() || 'closed'}`}>
-                      {isUpcoming && isActive ? 'UPCOMING' : event.status || 'CLOSED'}
-                    </span>
+                    <div className="status-container">
+                      <span className={`event-status-badge status-${event.status?.toLowerCase() || 'closed'}`}>
+                        {isFull ? 'FULL' : isUpcoming && isActive ? 'UPCOMING' : event.status || 'CLOSED'}
+                      </span>
+                      {isRunning && (
+                        <span className="time-indicator running">▶️ LIVE</span>
+                      )}
+                      {hasEnded && (
+                        <span className="time-indicator ended">⏹️ ENDED</span>
+                      )}
+                    </div>
                   </div>
                   
                   <div className="event-description">
@@ -302,18 +409,70 @@ export default function EventsPage() {
                       </span>
                     </div>
                     <div className="detail-item">
-                      <span className="detail-label">👥 Capacity:</span>
+                      <span className="detail-label">👥 Participants:</span>
                       <span className="detail-value">
-                        <span className="current-participants">0</span>
+                        <span className="current-participants">{event.currentParticipants || 0}</span>
                         <span className="capacity-separator">/</span>
                         <span className="max-participants">
                           {event.maxParticipants || '∞'}
                         </span>
+                        {isFull && <span className="full-badge"> FULL</span>}
                       </span>
                     </div>
+                    
+                    {/* Afișează codul text pentru profesori */}
+                    {isProfessor() && event.textCode && (
+                      <div className="detail-item">
+                        <span className="detail-label">🔑 Join Code:</span>
+                        <span className="detail-value code-display">
+                          <span className="code-text">{event.textCode}</span>
+                          <button 
+                            className="btn-copy-code"
+                            onClick={() => {
+                              navigator.clipboard.writeText(event.textCode);
+                              alert("Code copied to clipboard!");
+                            }}
+                            title="Copy code"
+                          >
+                            📋
+                          </button>
+                        </span>
+                      </div>
+                    )}
                   </div>
                   
-                  <div className="event-card-footer"> 
+                  <div className="event-card-footer">
+                    {isProfessor() ? (
+                      <div className="event-actions">
+                        <ExportButton type="event" id={event.id} />
+                        <button 
+                          className="btn-edit"
+                          onClick={() => handleEditEvent(event)}
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button 
+                          className="btn-delete"
+                          onClick={() => handleDeleteEvent(event.id)}
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="student-actions">
+                        {!hasEnded && event.status === 'OPEN' && !isFull && (
+                          <span className="join-hint">
+                            Ask the professor for the join code
+                          </span>
+                        )}
+                        {isFull && (
+                          <span className="full-message">Event is full</span>
+                        )}
+                        {(event.status === 'CLOSED' || hasEnded) && (
+                          <span className="closed-message">Registration closed</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -329,7 +488,7 @@ export default function EventsPage() {
             </p>
             {isProfessor() && !searchTerm && filterType === 'ALL' && filterStatus === 'ALL' && (
               <button 
-                className="btn btn-primary"
+                className="btn-create"
                 onClick={() => setShowCreateModal(true)}
               >
                 Create Event
@@ -339,7 +498,7 @@ export default function EventsPage() {
         )}
       </div>
 
-      {/* Create/Edit Modal */}
+      {/* Create/Edit Event Modal */}
       {showCreateModal && (
         <div className="modal-overlay">
           <div className="modal">
@@ -454,8 +613,92 @@ export default function EventsPage() {
                 </div>
               </div>
               <div className="modal-footer">
-                
-                
+                <button 
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setEditingEvent(null);
+                    resetForm();
+                  }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="btn-primary"
+                >
+                  {editingEvent ? 'Update Event' : 'Create Event'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Join Event Modal */}
+      {showJoinModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h3>Join Event</h3>
+              <button 
+                className="modal-close" 
+                onClick={() => {
+                  setShowJoinModal(false);
+                  setJoinCode("");
+                  setJoinError("");
+                }}
+              >
+                ×
+              </button>
+            </div>
+            
+            <form onSubmit={handleJoinEvent}>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Enter Event Code</label>
+                  <input
+                    type="text"
+                    value={joinCode}
+                    onChange={(e) => {
+                      setJoinCode(e.target.value.toUpperCase());
+                      setJoinError("");
+                    }}
+                    placeholder="Enter code (e.g., EVT-ABCD1234)"
+                    className="form-input join-code-input"
+                    autoFocus
+                  />
+                  {joinError && (
+                    <div className="error-message">
+                      ❌ {joinError}
+                    </div>
+                  )}
+                  <p className="form-hint">
+                    Get the code from your professor
+                  </p>
+                </div>
+              </div>
+              
+              <div className="modal-footer">
+                <button 
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => {
+                    setShowJoinModal(false);
+                    setJoinCode("");
+                    setJoinError("");
+                  }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="btn-primary"
+                  disabled={!joinCode.trim()}
+                >
+                  Join Event
+                </button>
               </div>
             </form>
           </div>

@@ -27,8 +27,11 @@ export default function Header() {
             <nav className="header-nav">
               <Link to="/dashboard" className={`nav-link ${isActive("/dashboard")}`}>Dashboard</Link>
               <Link to="/events" className={`nav-link ${isActive("/events")}`}>Events</Link>
-              <Link to="/attendance" className={`nav-link ${isActive("/attendance")}`}>Attendance</Link>
- 
+              <Link to="/history" className={`nav-link ${isActive("/history")}`}>History</Link>
+          {isProfessor() && (
+              <Link to="/groups" className={`nav-link ${isActive("/groups")}`}>Groups</Link>
+          )}
+          
             </nav>
             
             <div className="user-info">

@@ -1,7 +1,7 @@
 /* Add to existing App.css */
 @import './styles/Dashboard.css';
 @import './styles/Events.css';
-@import './styles/Attendance.css';
+
 .loading {
   text-align: center;
   padding: 2rem;

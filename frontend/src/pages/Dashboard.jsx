@@ -30,7 +30,7 @@ export default function Dashboard() {
       });
       const statsData = await statsResponse.json();
       
-      // Fetch events for additional stats
+      // Fetch events for additional stats and recent list
       const eventsResponse = await fetch("http://localhost:5000/events", {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -152,6 +152,9 @@ export default function Dashboard() {
                   const startDate = new Date(event.startTime);
                   const endDate = new Date(event.endTime);
                   
+                  // LOGIC FIX: Use data from backend instead of hardcoded 0
+                  const currentCount = event.currentParticipants || (event.Attendances ? event.Attendances.length : 0);
+                  
                   return (
                     <tr key={event.id} className="event-row">
                       <td className="event-name">
@@ -177,7 +180,8 @@ export default function Dashboard() {
                       </td>
                       <td className="event-participants">
                         <div className="participants-info">
-                          <span className="current-count">0</span>
+                          {/* UPDATED LINE BELOW */}
+                          <span className="current-count">{currentCount}</span>
                           <span className="separator">/</span>
                           <span className="max-count">{event.maxParticipants || '∞'}</span>
                         </div>
@@ -211,7 +215,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Quick Stats */}
+      {/* Quick Stats Section */}
       <div className="dashboard-section">
         <div className="section-header">
           <h3 className="section-title">

@@ -5,8 +5,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Header from "./components/Header";
 import Dashboard from "./pages/Dashboard";
 import EventsPage from "./pages/EventsPage";
-import AttendancePage from "./pages/AttendancePage";
 import LandingPage from "./pages/LandingPage";
+import EventGroupsPage from './pages/EventGroupsPage';
+import AttendanceHistory from "./pages/AttendanceHistory";
 import "./App.css";
 
 function App() {
@@ -30,11 +31,18 @@ function App() {
               </ProtectedRoute>
             } />
             
-            <Route path="/attendance" element={
+
+
+          <Route path="/history" element={
               <ProtectedRoute>
-                <AttendancePage />
+                <AttendanceHistory />
               </ProtectedRoute>
             } />
+            <Route path="/groups" element={
+              <ProtectedRoute requireProfessor={true}>
+                <EventGroupsPage />
+              </ProtectedRoute>
+} />
             
 
             <Route path="*" element={<Navigate to="/" />} />

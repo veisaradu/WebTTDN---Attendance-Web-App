@@ -5,11 +5,14 @@ require("dotenv").config();
 const sequelize = require("./sequelize");
 const { Event, EventGroup, Participant, Attendance } = require("./models");
 
+// RUTELE - ADAUGĂ ASTA ÎNAINTE
 const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const eventGroupRoutes = require("./routes/eventGroupRoutes");
 const participantRoutes = require("./routes/participantRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
+const eventJoinRoutes = require("./routes/eventJoinRoutes"); // ADAUGĂ
+const exportRoutes = require("./routes/export");
 
 const { auth, isProfessor } = require("./middleware/auth");
 
@@ -40,38 +43,39 @@ app.get("/stats", auth, async (req, res) => {
       totalEventGroups
     });
   } catch (error) {
+    console.error("Error fetching stats:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Routes
+// Routes - ORDINEA CORECTĂ
 app.use("/auth", authRoutes);
 app.use("/events", auth, eventRoutes);
 app.use("/event-groups", auth, isProfessor, eventGroupRoutes);
 app.use("/participants", participantRoutes);
 app.use("/attendance", auth, attendanceRoutes);
+app.use("/event-join", auth, eventJoinRoutes); // ADAUGĂ AICI
+app.use("/export", exportRoutes);
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
 
 // Error handling
 app.use((error, req, res, next) => {
-  console.error(error);
-  res.status(500).json({ error: error.message });
+  console.error("Server error:", error);
+  res.status(500).json({ 
+    error: error.message || "Internal server error"
+  });
 });
 
-// FORȚEAZĂ recrearea completă a tabelelor
-sequelize.sync({ force: true })
+// SCHIMBĂ force: true cu alter: true
+sequelize.sync({ alter: true })
   .then(() => {
-    console.log("✅ Database tables recreated successfully!");
+    console.log("✅ Database synced successfully!");
     
-    // Crează un utilizator admin de test (opțional)
-    return Participant.create({
-      name: "Admin",
-      email: "admin@admin.test",
-      password: "$2b$10$YourHashedPasswordHere", // Parola: "admin123"
-      role: "ADMIN"
-    });
-  })
-  .then(() => {
-    console.log("✅ Test admin user created!");
+    // Pornire server
     app.listen(5000, () => console.log("🚀 Server running on port 5000"));
   })
   .catch(err => {
