@@ -182,23 +182,7 @@ export default function LandingPage() {
           )}
         </div>
 
-        <div className="landing-features">
-          <div className="feature">
-            <div className="feature-icon">📊</div>
-            <h3>Real-time Dashboard</h3>
-            <p>Monitor attendance statistics and event participation</p>
-          </div>
-          <div className="feature">
-            <div className="feature-icon">👨‍🏫</div>
-            <h3>Professor Tools</h3>
-            <p>Create events, track attendance, and manage participants</p>
-          </div>
-          <div className="feature">
-            <div className="feature-icon">📱</div>
-            <h3>Easy Check-in</h3>
-            <p>Simple attendance confirmation for students</p>
-          </div>
-        </div>
+       
       </div>
     </div>
   );

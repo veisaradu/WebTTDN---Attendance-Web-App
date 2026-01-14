@@ -69,7 +69,7 @@ export default function EventsPage() {
     }
   };
 
-  // Filtrare evenimente
+ 
   const filteredEvents = events.filter((event) => {
     const matchesSearch =
       event.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -82,7 +82,7 @@ export default function EventsPage() {
     return matchesSearch && matchesType && matchesStatus;
   });
 
-  // Obține tipuri unice pentru filtru
+  
   const standardTypes = [
     "Workshop",
     "Lecture",
@@ -107,7 +107,7 @@ export default function EventsPage() {
     });
   };
 
-  // Funcție pentru join la eveniment
+
   const handleJoinEvent = async (e) => {
     e.preventDefault();
     setJoinError("");
@@ -332,7 +332,7 @@ export default function EventsPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
-      // Filtrăm pentru a afișa doar studenții
+      
       setAllStudents(data.filter((p) => p.role === "STUDENT") || []);
     } catch (error) {
       console.error("Error fetching students:", error);
@@ -392,7 +392,7 @@ export default function EventsPage() {
         <div className="header-actions">
           {!isProfessor() && (
             <button className="btn-join" onClick={() => setShowJoinModal(true)}>
-              🔗 Join Event
+              Join Event
             </button>
           )}
 
@@ -448,48 +448,7 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* Stats Summary */}
-      <div className="events-summary">
-        <div className="summary-card">
-          <div className="summary-icon total">📅</div>
-          <div className="summary-content">
-            <div className="summary-value">{events.length}</div>
-            <div className="summary-label">Total Events</div>
-          </div>
-        </div>
-        <div className="summary-card">
-          <div className="summary-icon active">🔴</div>
-          <div className="summary-content">
-            <div className="summary-value">
-              {events.filter((e) => e.status === "OPEN").length}
-            </div>
-            <div className="summary-label">Active</div>
-          </div>
-        </div>
-        <div className="summary-card">
-          <div className="summary-icon upcoming">⏰</div>
-          <div className="summary-content">
-            <div className="summary-value">
-              {events.filter((e) => new Date(e.startTime) > new Date()).length}
-            </div>
-            <div className="summary-label">Upcoming</div>
-          </div>
-        </div>
-        <div className="summary-card">
-          <div className="summary-icon closed">✅</div>
-          <div className="summary-content">
-            <div className="summary-value">
-              {
-                events.filter(
-                  (e) => e.status === "CLOSED" || e.status === "FULL"
-                ).length
-              }
-            </div>
-            <div className="summary-label">Completed/Full</div>
-          </div>
-        </div>
-      </div>
-
+      
       {/* Events Table */}
       <div className="events-table-container">
         {filteredEvents.length > 0 ? (
@@ -520,12 +479,7 @@ export default function EventsPage() {
                           ? "UPCOMING"
                           : event.status || "CLOSED"}
                       </span>
-                      {isRunning && (
-                        <span className="time-indicator running">▶️ LIVE</span>
-                      )}
-                      {hasEnded && (
-                        <span className="time-indicator ended">⏹️ ENDED</span>
-                      )}
+                     
                     </div>
                   </div>
 
@@ -535,13 +489,13 @@ export default function EventsPage() {
 
                   <div className="event-details">
                     <div className="detail-item">
-                      <span className="detail-label">📅 Date:</span>
+                      <span className="detail-label"> Date:</span>
                       <span className="detail-value">
                         {startDate.toLocaleDateString()}
                       </span>
                     </div>
                     <div className="detail-item">
-                      <span className="detail-label">⏰ Time:</span>
+                      <span className="detail-label"> Time:</span>
                       <span className="detail-value">
                         {startDate.toLocaleTimeString([], {
                           hour: "2-digit",
@@ -555,13 +509,13 @@ export default function EventsPage() {
                       </span>
                     </div>
                     <div className="detail-item">
-                      <span className="detail-label">🏷️ Type:</span>
+                      <span className="detail-label">Type:</span>
                       <span className="detail-value type-badge">
                         {event.eventType || "General"}
                       </span>
                     </div>
                     <div className="detail-item">
-                      <span className="detail-label">👥 Participants:</span>
+                      <span className="detail-label">Participants:</span>
                       <span className="detail-value">
                         <span className="current-participants">
                           {event.currentParticipants || 0}
@@ -577,7 +531,7 @@ export default function EventsPage() {
                     {/* Afișează codul text pentru profesori */}
                     {isProfessor() && event.textCode && (
                       <div className="detail-item">
-                        <span className="detail-label">🔑 Join Code:</span>
+                        <span className="detail-label">Join Code:</span>
                         <span className="detail-value code-display">
                           <span className="code-text">{event.textCode}</span>
                           <button
@@ -609,20 +563,20 @@ export default function EventsPage() {
                           className="btn-view"
                           onClick={() => handleViewParticipants(event.id)}
                         >
-                          👁️ Vezi Participanți
+                          Vezi Participanți
                         </button>
                         <ExportButton type="event" id={event.id} />
                         <button
                           className="btn-edit"
                           onClick={() => handleEditEvent(event)}
                         >
-                          ✏️ Edit
+                          Edit
                         </button>
                         <button
                           className="btn-delete"
                           onClick={() => handleDeleteEvent(event.id)}
                         >
-                          🗑️ Delete
+                          Delete
                         </button>
                       </div>
                     ) : (
@@ -649,7 +603,7 @@ export default function EventsPage() {
           </div>
         ) : (
           <div className="empty-state">
-            <div className="empty-icon">📅</div>
+            <div className="empty-icon"></div>
             <h4>No events found</h4>
             <p>
               {searchTerm || filterType !== "ALL" || filterStatus !== "ALL"
@@ -671,7 +625,7 @@ export default function EventsPage() {
         )}
       </div>
 
-      {/* Create/Edit Event Modal */}
+      
       {showCreateModal && (
         <div className="modal-overlay">
           <div className="modal">
@@ -808,7 +762,7 @@ export default function EventsPage() {
         </div>
       )}
 
-      {/* Join Event Modal */}
+      
       {showJoinModal && (
         <div className="modal-overlay">
           <div className="modal">

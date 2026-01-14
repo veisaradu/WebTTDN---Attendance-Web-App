@@ -22,7 +22,7 @@ export default function EventGroupsPage() {
 
   const fetchData = async () => {
     try {
-      // Fetch groups
+    
       const groupsResponse = await fetch("http://localhost:5000/event-groups", {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -32,7 +32,7 @@ export default function EventGroupsPage() {
         setGroups(groupsData || []);
       }
       
-      // Fetch all events for selection
+      
       const eventsResponse = await fetch("http://localhost:5000/events", {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -93,7 +93,7 @@ export default function EventGroupsPage() {
       if (response.ok) {
         setShowAddEventsModal(null);
         setSelectedEvents([]);
-        fetchData(); // Reîmprospătăm datele
+        fetchData(); 
         alert(`Events added successfully!`);
       } else {
         alert('Failed to add events');
@@ -145,10 +145,10 @@ export default function EventGroupsPage() {
 
   if (loading) return <div className="loading-spinner">Loading...</div>;
 
-  // Logică pentru modalul de adăugare evenimente
+  
   const activeGroupForModal = groups.find(g => g.id === showAddEventsModal);
   
-  // Normalizăm lista de evenimente din grup (Events vs events)
+  
   const activeGroupEvents = activeGroupForModal 
     ? (activeGroupForModal.Events || activeGroupForModal.events || [])
     : [];
@@ -173,7 +173,7 @@ export default function EventGroupsPage() {
 
       <div className="groups-grid">
         {groups.map(group => {
-          // 👇 AICI ESTE FIX-UL PRINCIPAL: Verificăm ambele variante de nume
+         
           const groupEvents = group.Events || group.events || [];
           
           return (

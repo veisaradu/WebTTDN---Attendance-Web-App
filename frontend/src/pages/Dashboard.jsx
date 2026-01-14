@@ -22,7 +22,7 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      // Fetch stats
+      
       const statsResponse = await fetch("http://localhost:5000/stats", {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -30,7 +30,7 @@ export default function Dashboard() {
       });
       const statsData = await statsResponse.json();
       
-      // Fetch events for additional stats and recent list
+     
       const eventsResponse = await fetch("http://localhost:5000/events", {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -38,7 +38,7 @@ export default function Dashboard() {
       });
       const eventsData = await eventsResponse.json() || [];
       
-      // Calculate additional stats
+     
       const now = new Date();
       const upcomingEvents = eventsData.filter(event => 
         new Date(event.startTime) > now
@@ -54,7 +54,7 @@ export default function Dashboard() {
         activeEvents
       });
 
-      // Sort by startTime descending and take last 5
+   
       const sorted = eventsData.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
       setRecentEvents(sorted.slice(0, 5));
     } catch (error) {
@@ -73,8 +73,8 @@ export default function Dashboard() {
       <div className="dashboard-header">
         <h2 className="page-title">Dashboard Overview</h2>
         <div className="welcome-message">
-          Welcome back, <span className="user-highlight">{user?.name}</span>!
-          <span className="role-badge">{user?.role}</span>
+          
+          
         </div>
       </div>
       
@@ -83,39 +83,24 @@ export default function Dashboard() {
         <Card 
           title="Total Events" 
           value={stats.totalEvents}
-          icon="📅"
-          color="blue"
+          
+          
           trend={`${stats.activeEvents} active`}
         />
-        <Card 
-          title="Total Participants" 
-          value={stats.totalParticipants} 
-          icon="👥"
-          color="green"
-        />
-        <Card 
-          title="Total Attendance" 
-          value={stats.totalAttendance} 
-          icon="✅"
-          color="purple"
-        />
+        
+      
         <Card 
           title="Event Groups" 
           value={stats.totalEventGroups} 
-          icon="📁"
-          color="orange"
+          
+          
         />
-        <Card 
-          title="Upcoming Events" 
-          value={stats.upcomingEvents} 
-          icon="⏰"
-          color="yellow"
-        />
+       
         <Card 
           title="Active Events" 
           value={stats.activeEvents} 
-          icon="🔴"
-          color="red"
+          
+         
         />
       </div>
 
@@ -123,7 +108,7 @@ export default function Dashboard() {
       <div className="dashboard-section">
         <div className="section-header">
           <h3 className="section-title">
-            <span className="section-icon">📋</span>
+            
             Recent Events
           </h3>
           <button 
@@ -152,7 +137,7 @@ export default function Dashboard() {
                   const startDate = new Date(event.startTime);
                   const endDate = new Date(event.endTime);
                   
-                  // LOGIC FIX: Use data from backend instead of hardcoded 0
+                  
                   const currentCount = event.currentParticipants || (event.Attendances ? event.Attendances.length : 0);
                   
                   return (
@@ -215,37 +200,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Quick Stats Section */}
-      <div className="dashboard-section">
-        <div className="section-header">
-          <h3 className="section-title">
-            <span className="section-icon">📈</span>
-            Quick Stats
-          </h3>
-        </div>
-        <div className="quick-stats">
-          <div className="stat-item">
-            <div className="stat-value">{stats.totalEvents}</div>
-            <div className="stat-label">Total Events</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">{stats.totalParticipants}</div>
-            <div className="stat-label">Registered Users</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">
-              {stats.totalParticipants > 0 
-                ? ((stats.totalAttendance / stats.totalParticipants) * 100).toFixed(1)
-                : 0}%
-            </div>
-            <div className="stat-label">Average Attendance</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-value">{stats.upcomingEvents}</div>
-            <div className="stat-label">Upcoming Events</div>
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 }

@@ -20,16 +20,19 @@ export default function Header() {
   return (
     <header className="header">
       <div className="header-container">
-        <h1 className="header-title">📊 Attendance App</h1>
+        <h1 className="header-title">Attendance App</h1>
         
         {user ? (
           <div className="header-right">
             <nav className="header-nav">
               <Link to="/dashboard" className={`nav-link ${isActive("/dashboard")}`}>Dashboard</Link>
               <Link to="/events" className={`nav-link ${isActive("/events")}`}>Events</Link>
-              <Link to="/history" className={`nav-link ${isActive("/history")}`}>History</Link>
+              
           {isProfessor() && (
+            <>
               <Link to="/groups" className={`nav-link ${isActive("/groups")}`}>Groups</Link>
+              <Link to="/history" className={`nav-link ${isActive("/history")}`}>History</Link>
+              </>
           )}
           
             </nav>

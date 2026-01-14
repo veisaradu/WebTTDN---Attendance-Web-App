@@ -15,7 +15,7 @@ export default function AttendanceHistory() {
           return;
         }
 
-        // URL diferit în funcție de rol
+        
         const url = isProfessor() 
           ? "http://localhost:5000/attendance/professor-history"
           : `http://localhost:5000/event-join/my-attendance/${user.id}`;
@@ -42,9 +42,9 @@ export default function AttendanceHistory() {
 
   if (loading) return <div className="loading-state">Loading history...</div>;
 
-  // ==========================================
-  // PROFESSOR VIEW (FULL REPORTS)
-  // ==========================================
+  
+  // PRFESSOR VIEW 
+  
   if (isProfessor()) {
     return (
       <div className="attendance-container">
@@ -111,9 +111,9 @@ export default function AttendanceHistory() {
     );
   }
 
-  // ==========================================
-  // STUDENT VIEW (PERSONAL HISTORY ONLY)
-  // ==========================================
+
+  // STUDENT VIEW
+
   return (
     <div className="attendance-container">
       <div className="history-header">

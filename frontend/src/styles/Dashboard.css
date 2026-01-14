@@ -13,7 +13,7 @@
 
 .welcome-message {
   font-size: 1.1rem;
-  color: #4b5563;
+  color: #f3f3f3;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -22,6 +22,10 @@
 .user-highlight {
   font-weight: 600;
   color: #3b82f6;
+}
+.dashboard-header .page-title {
+  color: #026cff 
+  
 }
 
 .role-badge {
