@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-
+import API_URL from "../config";
 export default function ExportButton({ type = "event", id }) {
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -8,7 +8,7 @@ export default function ExportButton({ type = "event", id }) {
   const handleExport = async () => {
     setLoading(true);
     try {
-      const url = `http://localhost:5000/export/${type}/${id}`;
+      const url = `http://${API_URL}/export/${type}/${id}`;
       const response = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
       });

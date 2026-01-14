@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Card from "../components/Card";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/Dashboard.css";
+import API_URL from "../config";
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -22,12 +23,12 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const statsResponse = await fetch("http://localhost:5000/stats", {
+      const statsResponse = await fetch("http://${API_URL}/stats", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const statsData = await statsResponse.json();
 
-      const eventsResponse = await fetch("http://localhost:5000/events", {
+      const eventsResponse = await fetch("http://${API_URL}/events", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const eventsData = (await eventsResponse.json()) || [];

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/Events.css";
 import ExportButton from "../components/ExportButton";
+import API_URL from "../config";
 
 export default function EventsPage() {
   const [events, setEvents] = useState([]);
@@ -48,7 +49,7 @@ export default function EventsPage() {
 
   const fetchEvents = async (isBackground = false) => {
     try {
-      const response = await fetch("http://localhost:5000/events", {
+      const response = await fetch("http://${API_URL}/events", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -112,7 +113,7 @@ export default function EventsPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/event-join/join", {
+      const response = await fetch("http://${API_URL}/event-join/join", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -140,7 +141,7 @@ export default function EventsPage() {
   const handleCreateEvent = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/events", {
+      const response = await fetch("http://${API_URL}/events", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -184,7 +185,7 @@ export default function EventsPage() {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:5000/events/${editingEvent.id}`,
+        `http://${API_URL}/events/${editingEvent.id}`,
         {
           method: "PUT",
           headers: {
@@ -220,7 +221,7 @@ export default function EventsPage() {
     ) {
       try {
         const response = await fetch(
-          `http://localhost:5000/events/${eventId}`,
+          `http://${API_URL}/events/${eventId}`,
           {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
@@ -240,7 +241,7 @@ export default function EventsPage() {
   const handleViewParticipants = async (eventId) => {
     setLoadingParticipants(true);
     try {
-      const response = await fetch(`http://localhost:5000/events/${eventId}`, {
+      const response = await fetch(`http://${API_URL}/events/${eventId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -256,7 +257,7 @@ export default function EventsPage() {
   const handleStatusChange = async (attendanceId, newStatus) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/attendance/${attendanceId}`,
+        `http://${API_URL}/attendance/${attendanceId}`,
         {
           method: "PUT",
           headers: {
@@ -282,7 +283,7 @@ export default function EventsPage() {
     setSelectedEventId(eventId);
     setShowAddManualModal(true);
     try {
-      const response = await fetch("http://localhost:5000/participants", {
+      const response = await fetch("http://${API_URL}/participants", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -294,7 +295,7 @@ export default function EventsPage() {
 
   const handleAddStudentToEvent = async (studentId) => {
     try {
-      const response = await fetch("http://localhost:5000/attendance", {
+      const response = await fetch("http://${API_URL}/attendance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

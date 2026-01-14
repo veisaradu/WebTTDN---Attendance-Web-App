@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/EventGroups.css";
 import ExportButton from "../components/ExportButton";
+import API_URL from "../config";
 
 export default function EventGroupsPage() {
   const [groups, setGroups] = useState([]);
@@ -25,7 +26,7 @@ export default function EventGroupsPage() {
 
   const fetchData = async () => {
     try {
-      const groupsResponse = await fetch("http://localhost:5000/event-groups", {
+      const groupsResponse = await fetch("http://${API_URL}/event-groups", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (groupsResponse.ok) {
@@ -33,7 +34,7 @@ export default function EventGroupsPage() {
         setGroups(Array.isArray(data) ? data : []);
       }
 
-      const eventsResponse = await fetch("http://localhost:5000/events", {
+      const eventsResponse = await fetch("http://${API_URL}/events", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (eventsResponse.ok) {
@@ -55,7 +56,7 @@ export default function EventGroupsPage() {
   const handleCreateGroup = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/event-groups", {
+      const response = await fetch("http://${API_URL}/event-groups", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -90,7 +91,7 @@ export default function EventGroupsPage() {
       };
 
       const response = await fetch(
-        `http://localhost:5000/event-groups/${groupId}/events`,
+        `http://${API_URL}/event-groups/${groupId}/events`,
         {
           method: "POST",
           headers: {
@@ -120,7 +121,7 @@ export default function EventGroupsPage() {
     if (!window.confirm("Remove event from group?")) return;
     try {
       const response = await fetch(
-        `http://localhost:5000/event-groups/${groupId}/events/${eventId}`,
+        `http://${API_URL}/event-groups/${groupId}/events/${eventId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -136,7 +137,7 @@ export default function EventGroupsPage() {
     if (!window.confirm("Delete this group?")) return;
     try {
       const response = await fetch(
-        `http://localhost:5000/event-groups/${groupId}`,
+        `http://${API_URL}/event-groups/${groupId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/AttendanceHistory.css";
+import API_URL from "../config";
 
 export default function AttendanceHistory() {
   const [history, setHistory] = useState([]);
@@ -16,8 +17,8 @@ export default function AttendanceHistory() {
         }
 
         const url = isProfessor()
-          ? "http://localhost:5000/attendance/professor-history"
-          : `http://localhost:5000/event-join/my-attendance/${user.id}`;
+          ? "http://${API_URL}/attendance/professor-history"
+          : `http://${API_URL}/event-join/my-attendance/${user.id}`;
 
         const response = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` },
