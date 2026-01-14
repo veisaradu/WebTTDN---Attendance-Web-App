@@ -1,11 +1,14 @@
 .event-groups-page {
   padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
+/* --- HEADER FIX: Puts button on the right --- */
 .page-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  justify-content: space-between; /* Pushes content to edges */
+  align-items: center; /* Vertically centers items */
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #e5e7eb;
@@ -15,14 +18,15 @@
   font-size: 1.875rem;
   font-weight: 700;
   color: #1c71e7;
-  margin: 0 0 0.25rem 0;
+  margin: 0;
 }
 
 .page-header p {
   color: #6b7280;
-  margin: 0;
+  margin: 0.25rem 0 0 0;
 }
 
+/* Button Styles */
 .btn-create {
   display: flex;
   align-items: center;
@@ -35,12 +39,14 @@
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
+  white-space: nowrap; /* Prevents text wrapping */
 }
 
 .btn-create:hover {
   background-color: #0056b3;
 }
 
+/* Grid Layout */
 .groups-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -53,46 +59,26 @@
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
-  transition: all 0.2s;
   display: flex;
   flex-direction: column;
 }
 
-.group-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-color: #3b82f6;
-}
-
 .group-header h3 {
   font-size: 1.25rem;
-  font-weight: 600;
   color: #1f2937;
   margin: 0 0 0.5rem 0;
 }
 
 .group-description {
   color: #6b7280;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
-.group-events {
-  margin: 1.5rem 0;
-}
-
-.group-events h4 {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #374151;
-  margin: 0 0 0.75rem 0;
-}
-
+/* Events List inside Card */
 .events-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 1rem 0;
 }
 
 .event-item {
@@ -106,294 +92,140 @@
   border-left: 3px solid #3b82f6;
 }
 
-.event-item span {
-  font-size: 0.875rem;
-  color: #374151;
-  flex: 1;
-}
-
 .btn-remove {
   background: none;
   border: none;
   color: #dc2626;
+  font-size: 1.2rem;
   cursor: pointer;
-  font-size: 1.25rem;
-  line-height: 1;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  padding: 0 0.5rem;
 }
 
 .btn-remove:hover {
   background-color: #fee2e2;
+  border-radius: 4px;
 }
 
-.no-events {
-  color: #9ca3af;
-  font-size: 0.875rem;
-  font-style: italic;
-  padding: 0.5rem;
-  background-color: #f9fafb;
-  border-radius: 6px;
-  text-align: center;
-}
-
+/* Footer Actions */
 .group-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-top: auto;
   padding-top: 1rem;
   border-top: 1px solid #e5e7eb;
-}
-
-.events-count {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #6b7280;
-}
-
-.group-actions {
   display: flex;
   gap: 0.5rem;
-  align-items: center;
+  justify-content: flex-end;
 }
 
-.btn-add-events {
+.btn-add-events, .btn-delete {
   padding: 0.5rem 1rem;
-  background-color: #10b981;
-  color: white;
   border: none;
   border-radius: 4px;
-  font-size: 0.875rem;
   cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.btn-add-events:hover {
-  background-color: #059669;
-}
-
-.btn-delete {
-  padding: 0.5rem 1rem;
-  background-color: #dc2626;
+  font-weight: 500;
   color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
-.btn-delete:hover {
-  background-color: #b91c1c;
-}
+.btn-add-events { background-color: #10b981; }
+.btn-add-events:hover { background-color: #059669; }
 
-.empty-state {
-  text-align: center;
-  padding: 3rem;
-  background: white;
-  border-radius: 12px;
-  border: 2px dashed #e5e7eb;
-}
+.btn-delete { background-color: #dc2626; }
+.btn-delete:hover { background-color: #b91c1c; }
 
-.empty-state h4 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-}
-
-.empty-state p {
-  color: #6b7280;
-  margin-bottom: 1.5rem;
-}
-
-/* Modal Styles */
+/* --- MODAL STYLES --- */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 10000; /* High z-index to ensure visibility */
 }
 
 .modal {
   background: white;
   border-radius: 12px;
   width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.modal.modal-lg {
-  max-width: 800px;
-}
-
-.modal-header {
+  max-width: 600px;
+  max-height: 85vh;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
-.modal-header h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f2937;
+.modal h3 {
+  padding: 1.5rem;
   margin: 0;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 2rem;
-  color: #9ca3af;
-  cursor: pointer;
-  line-height: 1;
-  padding: 0;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-}
-
-.modal-close:hover {
-  background-color: #f3f4f6;
-  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .modal-body {
-  padding: 0 1.5rem;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
   padding: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  margin-top: 1rem;
+  overflow-y: auto;
 }
 
-/* Form Styles */
+/* Event Select Cards in Modal */
+.event-select-card {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 10px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #1e293b; /* Fixes white text issue */
+}
+
+.event-select-card:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.event-select-card.selected {
+  background-color: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.event-select-card input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+/* Modal Forms */
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
-
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #374151;
 }
-
-.form-input,
-.form-textarea {
+.form-group input {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
+  box-sizing: border-box; /* Ensures padding doesn't overflow width */
 }
 
-.form-input:focus,
-.form-textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-/* Events Selection Modal */
-.selection-info {
-  color: #6b7280;
-  margin-bottom: 1rem;
-  font-size: 0.95rem;
-}
-
-.events-grid-select {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+.modal-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
   gap: 1rem;
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 0.5rem;
 }
 
-.event-select-card {
-    display: flex;
-    align-items: center;
-    padding: 12px;
-    margin-bottom: 10px;
-    background-color: #f8fafc; /* Fundal gri deschis */
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    
-    /* 👇 ACEASTA ESTE LINIA CARE REPARĂ PROBLEMA */
-    color: #1e293b; /* Text gri închis (aproape negru) */
-}
-
-.event-select-card:hover {
-    background-color: #f1f5f9;
-    border-color: #cbd5e1;
-}
-
-.event-select-card.selected {
-  background: #dbeafe;
-  border-color: #3b82f6;
-}
-
-.event-select-checkbox {
-  margin-top: 0.25rem;
-}
-
-.event-select-checkbox input[type="checkbox"] {
-  width: 1.25rem;
-  height: 1.25rem;
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-}
-
-.event-select-content {
-  flex: 1;
-}
-
-.event-select-content h4 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 0.25rem 0;
-}
-
-.event-date {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0 0 0.25rem 0;
-}
-
-.event-type {
-  font-size: 0.75rem;
-  color: #374151;
-  background: #e5e7eb;
-  padding: 0.25rem 0.5rem;
-  border-radius: 9999px;
-  display: inline-block;
 }
 
 .btn-primary {
@@ -402,78 +234,39 @@
   color: white;
   border: none;
   border-radius: 6px;
-  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background-color: #0056b3;
 }
 
 .btn-primary:disabled {
   background-color: #9ca3af;
   cursor: not-allowed;
 }
+/* FORCE DARK TEXT for events listed inside the Group Card */
+.event-item {
+  color: #1f2937 !important; /* Dark Grey */
+  background-color: #f9fafb;
+}
 
-.btn-secondary {
-  padding: 0.75rem 1.5rem;
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 6px;
+.event-item span {
+  color: #1f2937 !important;
   font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
-.btn-secondary:hover {
-  background-color: #5a6268;
+/* Fix for the Modal Inputs/Text */
+.modal h3, 
+.modal label, 
+.modal p, 
+.modal .event-select-card strong {
+  color: #1f2937 !important;
 }
 
-.loading-spinner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  font-size: 1.25rem;
-  color: #6b7280;
+/* Specific fix for the "Available Events" cards in the modal */
+.event-select-card {
+  color: #1f2937 !important;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .groups-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .group-footer {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-  
-  .group-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .btn-add-events,
-  .btn-delete {
-    width: 100%;
-  }
-  
-  .modal {
-    width: 95%;
-    margin: 1rem;
-  }
-  
-  .events-grid-select {
-    grid-template-columns: 1fr;
-  }
+.event-select-card small {
+  color: #6b7280 !important; /* Muted grey for dates */
 }

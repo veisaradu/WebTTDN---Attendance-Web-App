@@ -7,13 +7,17 @@ export default function EventGroupsPage() {
   const [groups, setGroups] = useState([]);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Modals state
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showAddEventsModal, setShowAddEventsModal] = useState(null);
+  const [showAddEventsModal, setShowAddEventsModal] = useState(null); // Holds the Group ID
+  
   const [selectedEvents, setSelectedEvents] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     description: ''
   });
+
   const { token, isProfessor } = useAuth();
 
   useEffect(() => {
@@ -22,24 +26,22 @@ export default function EventGroupsPage() {
 
   const fetchData = async () => {
     try {
-    
+      // 1. Fetch Groups
       const groupsResponse = await fetch("http://localhost:5000/event-groups", {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
       if (groupsResponse.ok) {
-        const groupsData = await groupsResponse.json();
-        setGroups(groupsData || []);
+        const data = await groupsResponse.json();
+        setGroups(Array.isArray(data) ? data : []);
       }
-      
-      
+
+      // 2. Fetch Events (for the picker)
       const eventsResponse = await fetch("http://localhost:5000/events", {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
       if (eventsResponse.ok) {
-        const eventsData = await eventsResponse.json();
-        setEvents(eventsData || []);
+        const data = await eventsResponse.json();
+        setEvents(Array.isArray(data) ? data : []);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -53,6 +55,7 @@ export default function EventGroupsPage() {
     setFormData({ ...formData, [name]: value });
   };
 
+  // --- CREATE GROUP ---
   const handleCreateGroup = async (e) => {
     e.preventDefault();
     try {
@@ -64,105 +67,116 @@ export default function EventGroupsPage() {
         },
         body: JSON.stringify(formData)
       });
-      
+
       if (response.ok) {
         setShowCreateModal(false);
         setFormData({ name: '', description: '' });
         fetchData();
       } else {
-        alert('Failed to create group');
+        const err = await response.json();
+        alert(`Error: ${err.error || 'Failed to create group'}`);
       }
     } catch (error) {
+      console.error(error);
       alert('Network error');
     }
   };
 
+  // --- ADD EVENTS TO GROUP (The fix for 400 Bad Request) ---
   const handleAddEventsToGroup = async (groupId) => {
-    if (selectedEvents.length === 0) return;
+    if (selectedEvents.length === 0) {
+      alert("Please select at least one event.");
+      return;
+    }
 
     try {
+      // Ensure we are sending an array of Integers, not strings
+      const payload = {
+        eventIds: selectedEvents.map(id => parseInt(id, 10))
+      };
+
       const response = await fetch(`http://localhost:5000/event-groups/${groupId}/events`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ eventIds: selectedEvents })
+        body: JSON.stringify(payload)
       });
-      
+
       if (response.ok) {
         setShowAddEventsModal(null);
         setSelectedEvents([]);
-        fetchData(); 
-        alert(`Events added successfully!`);
+        fetchData(); // Refresh to see changes
+        alert("Events added successfully!");
       } else {
-        alert('Failed to add events');
+        const err = await response.json();
+        alert(`Error: ${err.error || 'Failed to add events'}`);
       }
     } catch (error) {
+      console.error(error);
       alert('Network error');
     }
   };
 
+  // --- REMOVE EVENT ---
   const handleRemoveEventFromGroup = async (groupId, eventId) => {
-    if (window.confirm("Remove event from group?")) {
-      try {
-        const response = await fetch(`http://localhost:5000/event-groups/${groupId}/events/${eventId}`, {
-          method: "DELETE",
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (response.ok) {
-          fetchData();
-        }
-      } catch (error) {
-        console.error(error);
-      }
+    if (!window.confirm("Remove event from group?")) return;
+    try {
+      const response = await fetch(`http://localhost:5000/event-groups/${groupId}/events/${eventId}`, {
+        method: "DELETE",
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) fetchData();
+    } catch (error) {
+      console.error(error);
     }
   };
 
+  // --- DELETE GROUP ---
   const handleDeleteGroup = async (groupId) => {
-    if (window.confirm("Delete this group?")) {
-      try {
-        const response = await fetch(`http://localhost:5000/event-groups/${groupId}`, {
-          method: "DELETE",
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (response.ok) {
-          fetchData();
-        }
-      } catch (error) {
-        console.error(error);
-      }
+    if (!window.confirm("Delete this group?")) return;
+    try {
+      const response = await fetch(`http://localhost:5000/event-groups/${groupId}`, {
+        method: "DELETE",
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) fetchData();
+    } catch (error) {
+      console.error(error);
     }
   };
 
+  // --- HELPER: Toggle Selection ---
   const toggleEventSelection = (eventId) => {
     setSelectedEvents(prev => 
-      prev.includes(eventId) ? prev.filter(id => id !== eventId) : [...prev, eventId]
+      prev.includes(eventId)
+        ? prev.filter(id => id !== eventId)
+        : [...prev, eventId]
     );
   };
 
-  if (loading) return <div className="loading-spinner">Loading...</div>;
+  if (loading) return <div>Loading...</div>;
 
+  // --- LOGIC FOR MODAL DATA ---
+  // Find the group currently being edited
+  const activeGroup = groups.find(g => g.id === showAddEventsModal);
   
-  const activeGroupForModal = groups.find(g => g.id === showAddEventsModal);
+  // Handle case sensitivity (backend might send 'Events' or 'events')
+  const existingEvents = activeGroup ? (activeGroup.Events || activeGroup.events || []) : [];
   
-  
-  const activeGroupEvents = activeGroupForModal 
-    ? (activeGroupForModal.Events || activeGroupForModal.events || [])
-    : [];
-
+  // Filter events: Only show events NOT already in this group
   const availableEvents = showAddEventsModal 
-    ? events.filter(event => !activeGroupEvents.some(e => e.id === event.id))
+    ? events.filter(event => !existingEvents.some(e => e.id === event.id))
     : [];
 
   return (
     <div className="event-groups-page">
+      {/* HEADER: Button aligned to the right via CSS */}
       <div className="page-header">
         <div>
           <h2>Event Groups</h2>
-          <p>Manage groups</p>
+          <p>Manage and organize your events</p>
         </div>
         {isProfessor() && (
           <button className="btn-create" onClick={() => setShowCreateModal(true)}>
@@ -173,17 +187,17 @@ export default function EventGroupsPage() {
 
       <div className="groups-grid">
         {groups.map(group => {
-         
+          // Normalize events list
           const groupEvents = group.Events || group.events || [];
           
           return (
             <div key={group.id} className="group-card">
               <div className="group-header">
                 <h3>{group.name}</h3>
-                <p className="group-description">{group.description}</p>
+                <p className="group-description">{group.description || "No description"}</p>
                 
                 <div className="group-events">
-                  <h4>Events in this group ({groupEvents.length}):</h4>
+                  <strong>Events ({groupEvents.length}):</strong>
                   {groupEvents.length > 0 ? (
                     <ul className="events-list">
                       {groupEvents.map(event => (
@@ -191,8 +205,9 @@ export default function EventGroupsPage() {
                           <span>{event.name}</span>
                           {isProfessor() && (
                             <button 
-                              className="btn-remove"
+                              className="btn-remove" 
                               onClick={() => handleRemoveEventFromGroup(group.id, event.id)}
+                              title="Remove from group"
                             >
                               ×
                             </button>
@@ -201,73 +216,79 @@ export default function EventGroupsPage() {
                       ))}
                     </ul>
                   ) : (
-                    <p className="no-events">No events added yet</p>
+                    <p style={{ color: '#9ca3af', fontStyle: 'italic', marginTop: '0.5rem' }}>
+                      No events added yet.
+                    </p>
                   )}
                 </div>
               </div>
               
-              <div className="group-footer">
-                {isProfessor() && (
-                  <div className="group-actions">
-                    <button 
-                      className="btn-add-events"
-                      onClick={() => setShowAddEventsModal(group.id)}
-                    >
-                      + Add Events
-                    </button>
-                    <ExportButton type="group" id={group.id} />
-                    <button 
-                      className="btn-delete"
-                      onClick={() => handleDeleteGroup(group.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </div>
+              {isProfessor() && (
+                <div className="group-footer">
+                  <button 
+                    className="btn-add-events"
+                    onClick={() => setShowAddEventsModal(group.id)}
+                  >
+                    + Add Events
+                  </button>
+                  <ExportButton type="group" id={group.id} />
+                  <button 
+                    className="btn-delete"
+                    onClick={() => handleDeleteGroup(group.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
             </div>
           );
         })}
       </div>
 
-      {/* MODAL CREATE GROUP */}
+      {/* --- CREATE MODAL --- */}
       {showCreateModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Create Group</h3>
+            <h3>Create New Group</h3>
             <form onSubmit={handleCreateGroup}>
-              <div className="form-group">
-                <label>Name</label>
-                <input 
-                  name="name" 
-                  value={formData.name} 
-                  onChange={handleInputChange} 
-                  required 
-                  className="form-input"
-                />
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <input 
-                  name="description" 
-                  value={formData.description} 
-                  onChange={handleInputChange} 
-                  className="form-input"
-                />
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Group Name</label>
+                  <input 
+                    name="name" 
+                    value={formData.name} 
+                    onChange={handleInputChange} 
+                    required 
+                    placeholder="E.g., Math 101 Labs"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <input 
+                    name="description" 
+                    value={formData.description} 
+                    onChange={handleInputChange}
+                    placeholder="Optional description" 
+                  />
+                </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
-                <button type="submit" className="btn-primary">Create</button>
+                <button type="button" className="btn-secondary" onClick={() => setShowCreateModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary">
+                  Create Group
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* MODAL ADD EVENTS */}
+      {/* --- ADD EVENTS MODAL --- */}
       {showAddEventsModal && (
         <div className="modal-overlay">
-          <div className="modal modal-lg">
+          <div className="modal">
             <h3>Add Events to Group</h3>
             <div className="modal-body">
               {availableEvents.length > 0 ? (
@@ -279,32 +300,40 @@ export default function EventGroupsPage() {
                   >
                     <input 
                       type="checkbox" 
-                      checked={selectedEvents.includes(event.id)} 
-                      readOnly 
+                      checked={selectedEvents.includes(event.id)}
+                      readOnly
                     />
-                    <div style={{marginLeft: '10px'}}>
+                    <div>
                       <strong>{event.name}</strong>
                       <br/>
-                      <small>{new Date(event.startTime).toLocaleDateString()}</small>
+                      <small style={{ color: '#64748b' }}>
+                        {new Date(event.startTime).toLocaleDateString()}
+                      </small>
                     </div>
                   </div>
                 ))
               ) : (
-                <p>No available events to add.</p>
+                <p>No available events found (all events might already be in this group).</p>
               )}
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn-secondary" onClick={() => {
-                setShowAddEventsModal(null);
-                setSelectedEvents([]);
-              }}>Cancel</button>
+              <button 
+                type="button" 
+                className="btn-secondary" 
+                onClick={() => {
+                  setShowAddEventsModal(null);
+                  setSelectedEvents([]);
+                }}
+              >
+                Cancel
+              </button>
               <button 
                 type="button" 
                 className="btn-primary" 
                 onClick={() => handleAddEventsToGroup(showAddEventsModal)}
                 disabled={selectedEvents.length === 0}
               >
-                Add Selected
+                Add Selected ({selectedEvents.length})
               </button>
             </div>
           </div>

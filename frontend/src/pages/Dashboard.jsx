@@ -22,31 +22,26 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      
+      // 1. Stats fetch (Backend calculates total counts)
       const statsResponse = await fetch("http://localhost:5000/stats", {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       const statsData = await statsResponse.json();
       
-     
+      // 2. Events fetch (Backend already closed expired events)
       const eventsResponse = await fetch("http://localhost:5000/events", {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       const eventsData = await eventsResponse.json() || [];
       
-     
+      // 3. Count local metrics based on FRESH data
       const now = new Date();
-      const upcomingEvents = eventsData.filter(event => 
-        new Date(event.startTime) > now
-      ).length;
       
-      const activeEvents = eventsData.filter(event => 
-        event.status === 'OPEN'
-      ).length;
+      // Note: We don't need complex logic for 'Active' anymore, simply check status
+      const activeEvents = eventsData.filter(event => event.status === 'OPEN').length;
+      
+      // Upcoming is just future start time
+      const upcomingEvents = eventsData.filter(event => new Date(event.startTime) > now).length;
 
       setStats({
         ...statsData,
@@ -54,7 +49,7 @@ export default function Dashboard() {
         activeEvents
       });
 
-   
+      // Sort by Start Time
       const sorted = eventsData.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
       setRecentEvents(sorted.slice(0, 5));
     } catch (error) {
@@ -73,50 +68,22 @@ export default function Dashboard() {
       <div className="dashboard-header">
         <h2 className="page-title">Dashboard Overview</h2>
         <div className="welcome-message">
-          
-          
         </div>
       </div>
       
       {/* Stats Cards */}
       <div className="stats-grid">
-        <Card 
-          title="Total Events" 
-          value={stats.totalEvents}
-          
-          
-          trend={`${stats.activeEvents} active`}
-        />
-        
-      
-        <Card 
-          title="Event Groups" 
-          value={stats.totalEventGroups} 
-          
-          
-        />
-       
-        <Card 
-          title="Active Events" 
-          value={stats.activeEvents} 
-          
-         
-        />
+        <Card title="Total Events" value={stats.totalEvents}  color="blue" />
+        <Card title="Event Groups" value={stats.totalEventGroups} color="orange" />
+        <Card title="Active Events" value={stats.activeEvents}  color="red" trend="Open now" />
+        {/* You removed upcoming, but I left variable calculation just in case */}
       </div>
 
-      {/* Recent Events */}
+      {/* Recent Events Table */}
       <div className="dashboard-section">
         <div className="section-header">
-          <h3 className="section-title">
-            
-            Recent Events
-          </h3>
-          <button 
-            className="btn btn-primary"
-            onClick={() => window.location.href = '/events'}
-          >
-            View All Events
-          </button>
+          <h3 className="section-title">Recent Events</h3>
+          <button className="btn btn-primary" onClick={() => window.location.href = '/events'}>View All</button>
         </div>
         
         {recentEvents.length > 0 ? (
@@ -136,17 +103,12 @@ export default function Dashboard() {
                 {recentEvents.map(event => {
                   const startDate = new Date(event.startTime);
                   const endDate = new Date(event.endTime);
-                  
-                  
-                  const currentCount = event.currentParticipants || (event.Attendances ? event.Attendances.length : 0);
+                  const currentCount = event.currentParticipants || 0;
                   
                   return (
                     <tr key={event.id} className="event-row">
                       <td className="event-name">
                         <div className="event-name-main">{event.name}</div>
-                        {event.description && (
-                          <div className="event-description">{event.description}</div>
-                        )}
                       </td>
                       <td className="event-time">
                         <div className="event-date">{startDate.toLocaleDateString()}</div>
@@ -159,23 +121,20 @@ export default function Dashboard() {
                         <span className="type-badge">{event.eventType || 'General'}</span>
                       </td>
                       <td className="event-status">
-                        <span className={`status-badge status-${event.status?.toLowerCase() || 'closed'}`}>
-                          {event.status || 'CLOSED'}
+                        {/* Simply use the DB status now */}
+                        <span className={`status-badge status-${event.status?.toLowerCase()}`}>
+                          {event.status}
                         </span>
                       </td>
                       <td className="event-participants">
                         <div className="participants-info">
-                          {/* UPDATED LINE BELOW */}
                           <span className="current-count">{currentCount}</span>
                           <span className="separator">/</span>
                           <span className="max-count">{event.maxParticipants || '∞'}</span>
                         </div>
                       </td>
                       <td className="event-actions">
-                        <button 
-                          className="btn btn-sm btn-outline"
-                          onClick={() => window.location.href = `/attendance?event=${event.id}`}
-                        >
+                        <button className="btn btn-sm btn-outline" onClick={() => window.location.href = `/attendance?event=${event.id}`}>
                           View
                         </button>
                       </td>
@@ -187,20 +146,10 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="empty-state">
-            <div className="empty-icon">📅</div>
             <h4>No events yet</h4>
-            <p>Create your first event to get started</p>
-            <button 
-              className="btn btn-primary"
-              onClick={() => window.location.href = '/events'}
-            >
-              Create Event
-            </button>
           </div>
         )}
       </div>
-
-      
     </div>
   );
 }

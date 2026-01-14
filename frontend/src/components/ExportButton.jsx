@@ -1,4 +1,3 @@
-// ++ file: src/components/ExportButton.jsx
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -15,9 +14,18 @@ export default function ExportButton({ type = 'event', id }) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch CSV');
+        // Try to read error message from JSON, fallback to status text
+        let errorMessage = 'Failed to fetch CSV';
+        try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+            errorMessage = response.statusText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
+      // Handle download
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -29,9 +37,10 @@ export default function ExportButton({ type = 'event', id }) {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(downloadUrl);
+      
     } catch (error) {
-      alert(error.message);
-      console.error(error);
+      console.error("Export error:", error);
+      alert(`Export Failed: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -39,11 +48,19 @@ export default function ExportButton({ type = 'event', id }) {
 
   return (
     <button 
-      className="btn btn-outline"
+      className="btn btn-outline" // Ensure this class exists in your CSS or use inline styles
+      style={{ 
+        padding: '0.5rem 1rem', 
+        border: '1px solid #ccc', 
+        borderRadius: '4px', 
+        background: 'white', 
+        cursor: 'pointer',
+        marginLeft: '5px' 
+      }}
       onClick={handleExport}
       disabled={loading}
     >
-      {loading ? 'Exporting...' : `Export ${type === 'event' ? 'Event' : 'Group'} CSV`}
+      {loading ? 'Exporting...' : `Export CSV`}
     </button>
   );
 }
