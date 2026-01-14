@@ -1,123 +1,108 @@
 const express = require("express");
 const router = express.Router();
-const { Event, Attendance, Participant } = require("../models");
+const { Event, Participant, Attendance } = require("../models");
+const { Op } = require("sequelize");
 
-// Join la eveniment
+// POST /event-join/join
 router.post("/join", async (req, res) => {
   try {
     const { textCode, participantId } = req.body;
-    
+
+    console.log(`[Join Attempt] Code: ${textCode}, StudentID: ${participantId}`);
+
+    // 1. Validate Input
     if (!textCode || !participantId) {
-      return res.status(400).json({ 
-        error: "Text code and participant ID are required" 
-      });
+      console.log("❌ Missing fields");
+      return res.status(400).json({ error: "Missing code or student ID" });
     }
-    
-    // Găsește evenimentul după cod
-    const event = await Event.findOne({
-      where: { textCode: textCode.toUpperCase() }
+
+    // 2. Find the Event by Code
+    const event = await Event.findOne({ 
+      where: { textCode: textCode } 
     });
-    
+
     if (!event) {
-      return res.status(404).json({ 
-        error: "Invalid event code" 
-      });
+      console.log("❌ Event not found for code:", textCode);
+      return res.status(404).json({ error: "Invalid event code" });
     }
-    
-    // Verifică dacă participantul există
-    const participant = await Participant.findByPk(participantId);
-    if (!participant) {
-      return res.status(404).json({ 
-        error: "Participant not found" 
-      });
+
+    // 3. Check if Event is OPEN
+    // We also double-check the time just in case the status hasn't auto-updated yet
+    const now = new Date();
+    if (event.status !== 'OPEN' || new Date(event.endTime) < now) {
+      console.log("❌ Event is closed or expired");
+      return res.status(400).json({ error: "This event is closed" });
     }
-    
-    // Verifică dacă participantul este deja înscris
+
+    // 4. Check if Student Exists
+    const student = await Participant.findByPk(participantId);
+    if (!student) {
+      console.log("❌ Student not found ID:", participantId);
+      return res.status(404).json({ error: "Student account not found" });
+    }
+
+    // 5. Check if Already Joined
     const existingAttendance = await Attendance.findOne({
       where: {
-        participantId,
-        eventId: event.id
+        eventId: event.id,
+        participantId: student.id
       }
     });
-    
+
     if (existingAttendance) {
-      return res.status(400).json({ 
-        error: "You are already registered for this event" 
-      });
+      console.log("⚠️ Already joined");
+      return res.status(400).json({ error: "You have already joined this event" });
     }
-    
-    // Verifică dacă evenimentul s-a terminat deja
-    const now = new Date();
-    const eventEnd = new Date(event.endTime);
-    
-    if (now > eventEnd) {
-      return res.status(400).json({ 
-        error: "Event has already ended" 
-      });
-    }
-    
-    // Creează înregistrarea de participare
-    const attendance = await Attendance.create({
-      participantId,
+
+    // 6. Register Attendance
+    // We capture the IP if available (x-forwarded-for is for proxies like Render/Heroku)
+    const ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+    const newAttendance = await Attendance.create({
       eventId: event.id,
+      participantId: student.id,
+      status: 'PRESENT',
       confirmedAt: new Date(),
-      status: 'PRESENT'
+      ipAddress: ipAddress
     });
+
+    // 7. Increment Participant Count in Event Table (Optional, but good for performance)
+    await event.increment('currentParticipants');
+
+    console.log(`✅ Success! User ${student.name} joined Event ${event.name}`);
     
-    // Actualizează numărul de participanți
-    const newCount = (event.currentParticipants || 0) + 1;
-    const newStatus = newCount >= event.maxParticipants ? 'FULL' : event.status;
-    
-    await event.update({
-      currentParticipants: newCount,
-      status: newStatus
-    });
-    
-    res.status(201).json({
-      success: true,
-      message: "Successfully joined the event",
-      attendance: {
-        id: attendance.id,
-        participantId: attendance.participantId,
-        eventId: attendance.eventId,
-        confirmedAt: attendance.confirmedAt,
-        status: attendance.status
-      },
+    res.status(200).json({ 
+      message: "Joined successfully", 
       event: {
         id: event.id,
         name: event.name,
-        startTime: event.startTime,
-        currentParticipants: newCount,
-        maxParticipants: event.maxParticipants
+        startTime: event.startTime
       }
     });
-    
+
   } catch (error) {
-    console.error("Error joining event:", error);
-    res.status(500).json({ 
-      error: "Server error joining event" 
-    });
+    console.error("❌ SERVER ERROR in /join:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-// Obține istoricul participărilor
-router.get("/my-attendance/:participantId", async (req, res) => {
+// GET /event-join/my-attendance/:studentId
+router.get("/my-attendance/:studentId", async (req, res) => {
   try {
-    const { participantId } = req.params;
+    const { studentId } = req.params;
     
-    const attendance = await Attendance.findAll({
-      where: { participantId },
+    const history = await Attendance.findAll({
+      where: { participantId: studentId },
       include: [{
         model: Event,
-        attributes: ['id', 'name', 'startTime', 'eventType', 'textCode', 'description']
+        attributes: ['id', 'name', 'textCode', 'startTime', 'endTime', 'eventType', 'status']
       }],
-      order: [['confirmedAt', 'DESC']]
+      order: [['createdAt', 'DESC']]
     });
-    
-    res.json(attendance || []);
-    
+
+    res.json(history);
   } catch (error) {
-    console.error("Error fetching attendance:", error);
+    console.error("Error fetching student history:", error);
     res.status(500).json({ error: "Server error" });
   }
 });

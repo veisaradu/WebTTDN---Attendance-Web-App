@@ -21,7 +21,7 @@ const EventGroup = sequelize.define("EventGroup", {
   maxParticipants: DataTypes.INTEGER,
   eventType: DataTypes.STRING,
 }, {
-  tableName: 'event_groups',
+  tableName: 'event_groups', // ✅ Explicit table name
   timestamps: true
 });
 
