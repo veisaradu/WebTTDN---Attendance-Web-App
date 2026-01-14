@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 const AuthContext = createContext({});
 
@@ -7,26 +7,25 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
   useEffect(() => {
     if (token) {
-      // Verify token and get user info
-      fetch('http://localhost:5000/auth/me', {
+      fetch("http://localhost:5000/auth/me", {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       })
-        .then(res => {
+        .then((res) => {
           if (res.ok) return res.json();
-          throw new Error('Invalid token');
+          throw new Error("Invalid token");
         })
-        .then(data => {
+        .then((data) => {
           setUser(data.participant);
-          localStorage.setItem('token', token);
+          localStorage.setItem("token", token);
         })
         .catch(() => {
-          localStorage.removeItem('token');
+          localStorage.removeItem("token");
           setToken(null);
           setUser(null);
         })
@@ -38,18 +37,18 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:5000/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+      const response = await fetch("http://localhost:5000/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
-        throw new Error('Login failed');
+        throw new Error("Login failed");
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.token);
+      localStorage.setItem("token", data.token);
       setToken(data.token);
       setUser(data.participant);
       return { success: true };
@@ -60,19 +59,19 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     try {
-      const response = await fetch('http://localhost:5000/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+      const response = await fetch("http://localhost:5000/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Registration failed');
+        throw new Error(errorData.error || "Registration failed");
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.token);
+      localStorage.setItem("token", data.token);
       setToken(data.token);
       setUser(data.participant);
       return { success: true };
@@ -82,17 +81,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setToken(null);
     setUser(null);
   };
 
   const isProfessor = () => {
-    return user && (user.role === 'PROFESSOR' || user.role === 'ADMIN');
+    return user && (user.role === "PROFESSOR" || user.role === "ADMIN");
   };
 
   const isAdmin = () => {
-    return user && user.role === 'ADMIN';
+    return user && user.role === "ADMIN";
   };
 
   const value = {
@@ -103,12 +102,8 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     isProfessor,
-    isAdmin
+    isAdmin,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

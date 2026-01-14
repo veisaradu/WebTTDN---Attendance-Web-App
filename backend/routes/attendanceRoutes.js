@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Attendance, Participant, Event } = require("../models");
-const { isProfessor } = require("../middleware/auth"); // Asigură-te că importi middleware-ul
+const { isProfessor } = require("../middleware/auth");
 router.get("/", async (req, res, next) => {
   try {
     const items = await Attendance.findAll({

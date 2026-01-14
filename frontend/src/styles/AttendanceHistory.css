@@ -19,17 +19,16 @@
 }
 
 .history-title {
-  color: #116ae7; 
+  color: #116ae7;
   font-size: 2rem;
   font-weight: 800;
   margin: 0;
-  opacity: 1; 
+  opacity: 1;
   letter-spacing: -0.5px;
 }
 
-/* --- FIX: Force Event Name to be Black --- */
 .history-card-header h4 {
-  color: #1e293b !important; /* Dark Slate/Black */
+  color: #1e293b !important;
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
@@ -94,7 +93,8 @@
   border: 1px solid #fecaca;
 }
 
-.loading-state, .no-data {
+.loading-state,
+.no-data {
   text-align: center;
   padding: 3rem;
   color: #64748b;
@@ -102,14 +102,13 @@
   font-weight: 500;
 }
 
-/* PROFESSOR VIEW SPECIFIC */
 .professor-card {
-  padding: 0; 
+  padding: 0;
   overflow: hidden;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   margin-bottom: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .professor-card .history-card-header {
@@ -142,7 +141,6 @@
   overflow-x: auto;
 }
 
-/* TABLE STYLING WITHIN CARD */
 .participants-table {
   width: 100%;
   border-collapse: collapse;
@@ -187,7 +185,7 @@
 }
 
 .time-cell {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
   color: #475569;
 }
 
@@ -198,7 +196,6 @@
   font-style: italic;
 }
 
-/* STUDENT CARD SPECIFIC */
 .history-card {
   background: #fff;
   border: 1px solid #e2e8f0;

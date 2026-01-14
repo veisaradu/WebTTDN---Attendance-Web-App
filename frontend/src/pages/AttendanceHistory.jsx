@@ -15,20 +15,18 @@ export default function AttendanceHistory() {
           return;
         }
 
-        
-        const url = isProfessor() 
+        const url = isProfessor()
           ? "http://localhost:5000/attendance/professor-history"
           : `http://localhost:5000/event-join/my-attendance/${user.id}`;
 
         const response = await fetch(url, {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!response.ok) throw new Error("Fetch failed");
 
         const data = await response.json();
         setHistory(data || []);
-        
       } catch (error) {
         console.error("Error fetching history:", error);
         setHistory([]);
@@ -36,15 +34,12 @@ export default function AttendanceHistory() {
         setLoading(false);
       }
     };
-    
+
     fetchData();
   }, [token, user, isProfessor]);
 
   if (loading) return <div className="loading-state">Loading history...</div>;
 
-  
-  // PRFESSOR VIEW 
-  
   if (isProfessor()) {
     return (
       <div className="attendance-container">
@@ -61,14 +56,19 @@ export default function AttendanceHistory() {
                   <div>
                     <h4>{event.name}</h4>
                     <span className="event-date">
-                      {new Date(event.startTime).toLocaleDateString()} • {new Date(event.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      {new Date(event.startTime).toLocaleDateString()} •{" "}
+                      {new Date(event.startTime).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </span>
                   </div>
                   <div className="stats-pill">
-                    👥 {event.Attendances ? event.Attendances.length : 0} Participants
+                    👥 {event.Attendances ? event.Attendances.length : 0}{" "}
+                    Participants
                   </div>
                 </div>
-                
+
                 <div className="participants-section">
                   {event.Attendances && event.Attendances.length > 0 ? (
                     <table className="participants-table">
@@ -83,15 +83,25 @@ export default function AttendanceHistory() {
                       <tbody>
                         {event.Attendances.map((att) => (
                           <tr key={att.id}>
-                            <td className="fw-bold">{att.Participant?.name || "Unknown"}</td>
-                            <td className="text-muted">{att.Participant?.email}</td>
+                            <td className="fw-bold">
+                              {att.Participant?.name || "Unknown"}
+                            </td>
+                            <td className="text-muted">
+                              {att.Participant?.email}
+                            </td>
                             <td>
-                              <span className={`status-badge status-${att.status?.toLowerCase() || 'present'}`}>
+                              <span
+                                className={`status-badge status-${
+                                  att.status?.toLowerCase() || "present"
+                                }`}
+                              >
                                 {att.status}
                               </span>
                             </td>
                             <td className="time-cell">
-                              {att.confirmedAt ? new Date(att.confirmedAt).toLocaleTimeString() : "-"}
+                              {att.confirmedAt
+                                ? new Date(att.confirmedAt).toLocaleTimeString()
+                                : "-"}
                             </td>
                           </tr>
                         ))}
@@ -111,9 +121,6 @@ export default function AttendanceHistory() {
     );
   }
 
-
-  // STUDENT VIEW
-
   return (
     <div className="attendance-container">
       <div className="history-header">
@@ -126,23 +133,31 @@ export default function AttendanceHistory() {
           <div className="history-grid">
             {history.map((record) => (
               <div key={record.id} className="history-card">
-                 <div className="history-card-header">
+                <div className="history-card-header">
                   <h4>{record.Event?.name || "Event"}</h4>
-                  <span className={`status-badge status-${record.status?.toLowerCase() || 'present'}`}>
-                    {record.status || 'PRESENT'}
+                  <span
+                    className={`status-badge status-${
+                      record.status?.toLowerCase() || "present"
+                    }`}
+                  >
+                    {record.status || "PRESENT"}
                   </span>
                 </div>
                 <div className="history-details">
                   <div className="detail-row">
                     <span className="detail-label">Date:</span>
                     <span className="detail-value">
-                      {record.Event?.startTime ? new Date(record.Event.startTime).toLocaleDateString() : "-"}
+                      {record.Event?.startTime
+                        ? new Date(record.Event.startTime).toLocaleDateString()
+                        : "-"}
                     </span>
                   </div>
                   <div className="detail-row">
                     <span className="detail-label">Joined At:</span>
                     <span className="detail-value">
-                      {record.confirmedAt ? new Date(record.confirmedAt).toLocaleString() : "-"}
+                      {record.confirmedAt
+                        ? new Date(record.confirmedAt).toLocaleString()
+                        : "-"}
                     </span>
                   </div>
                 </div>
@@ -150,7 +165,9 @@ export default function AttendanceHistory() {
             ))}
           </div>
         ) : (
-          <div className="no-data">This page is only visible to the professor.</div>
+          <div className="no-data">
+            This page is only visible to the professor.
+          </div>
         )}
       </div>
     </div>

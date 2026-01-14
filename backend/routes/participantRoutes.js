@@ -3,7 +3,6 @@ const router = express.Router();
 const { Participant } = require("../models");
 const { auth, isProfessor } = require("../middleware/auth");
 
-// GET all participants (only professors)
 router.get("/", auth, isProfessor, async (req, res, next) => {
   try {
     const participants = await Participant.findAll({
@@ -15,12 +14,11 @@ router.get("/", auth, isProfessor, async (req, res, next) => {
   }
 });
 
-// GET all students (doar pentru profesori)
 router.get("/students", auth, isProfessor, async (req, res, next) => {
   try {
     const students = await Participant.findAll({
-      where: { role: "STUDENT" }, // Filtrează după rolul de student
-      attributes: { exclude: ["password"] }, // Nu trimite parola
+      where: { role: "STUDENT" },
+      attributes: { exclude: ["password"] },
     });
 
     students.length ? res.json(students) : res.sendStatus(204);
@@ -29,11 +27,10 @@ router.get("/students", auth, isProfessor, async (req, res, next) => {
   }
 });
 
-// POST create participant (register - no auth required)
 router.post("/", async (req, res, next) => {
   try {
     const newP = await Participant.create(req.body);
-    // Don't send password back
+
     const { password, ...participantWithoutPassword } = newP.toJSON();
     res.status(201).json(participantWithoutPassword);
   } catch (e) {
@@ -41,7 +38,6 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// GET current participant profile
 router.get("/profile", auth, async (req, res, next) => {
   try {
     const participant = await Participant.findByPk(req.participant.id, {
@@ -53,10 +49,8 @@ router.get("/profile", auth, async (req, res, next) => {
   }
 });
 
-// GET single participant by ID (only professors or self)
 router.get("/:id", auth, async (req, res, next) => {
   try {
-    // Allow access if requesting own profile or if professor
     if (
       req.participant.id !== parseInt(req.params.id) &&
       req.participant.role !== "PROFESSOR" &&
@@ -74,10 +68,8 @@ router.get("/:id", auth, async (req, res, next) => {
   }
 });
 
-// PUT update participant (only self or professor)
 router.put("/:id", auth, async (req, res, next) => {
   try {
-    // Allow update if own profile or if professor
     if (
       req.participant.id !== parseInt(req.params.id) &&
       req.participant.role !== "PROFESSOR" &&
@@ -89,7 +81,6 @@ router.put("/:id", auth, async (req, res, next) => {
     const participant = await Participant.findByPk(req.params.id);
     if (!participant) return res.sendStatus(404);
 
-    // Don't allow role change unless admin
     if (req.body.role && req.participant.role !== "ADMIN") {
       delete req.body.role;
     }
@@ -102,10 +93,8 @@ router.put("/:id", auth, async (req, res, next) => {
   }
 });
 
-// DELETE participant (only professors/admins or self)
 router.delete("/:id", auth, async (req, res, next) => {
   try {
-    // Allow delete if own profile or if professor/admin
     if (
       req.participant.id !== parseInt(req.params.id) &&
       req.participant.role !== "PROFESSOR" &&

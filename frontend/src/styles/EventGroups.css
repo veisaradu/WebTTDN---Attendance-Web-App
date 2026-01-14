@@ -4,11 +4,10 @@
   margin: 0 auto;
 }
 
-/* --- HEADER FIX: Puts button on the right --- */
 .page-header {
   display: flex;
-  justify-content: space-between; /* Pushes content to edges */
-  align-items: center; /* Vertically centers items */
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #e5e7eb;
@@ -26,7 +25,6 @@
   margin: 0.25rem 0 0 0;
 }
 
-/* Button Styles */
 .btn-create {
   display: flex;
   align-items: center;
@@ -39,14 +37,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
-  white-space: nowrap; /* Prevents text wrapping */
+  white-space: nowrap;
 }
 
 .btn-create:hover {
   background-color: #0056b3;
 }
 
-/* Grid Layout */
 .groups-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -74,7 +71,6 @@
   margin-bottom: 1rem;
 }
 
-/* Events List inside Card */
 .events-list {
   list-style: none;
   padding: 0;
@@ -106,7 +102,6 @@
   border-radius: 4px;
 }
 
-/* Footer Actions */
 .group-footer {
   margin-top: auto;
   padding-top: 1rem;
@@ -116,7 +111,8 @@
   justify-content: flex-end;
 }
 
-.btn-add-events, .btn-delete {
+.btn-add-events,
+.btn-delete {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 4px;
@@ -125,21 +121,31 @@
   color: white;
 }
 
-.btn-add-events { background-color: #10b981; }
-.btn-add-events:hover { background-color: #059669; }
+.btn-add-events {
+  background-color: #10b981;
+}
+.btn-add-events:hover {
+  background-color: #059669;
+}
 
-.btn-delete { background-color: #dc2626; }
-.btn-delete:hover { background-color: #b91c1c; }
+.btn-delete {
+  background-color: #dc2626;
+}
+.btn-delete:hover {
+  background-color: #b91c1c;
+}
 
-/* --- MODAL STYLES --- */
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000; /* High z-index to ensure visibility */
+  z-index: 10000;
 }
 
 .modal {
@@ -164,7 +170,6 @@
   overflow-y: auto;
 }
 
-/* Event Select Cards in Modal */
 .event-select-card {
   display: flex;
   align-items: center;
@@ -174,7 +179,7 @@
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   cursor: pointer;
-  color: #1e293b; /* Fixes white text issue */
+  color: #1e293b;
 }
 
 .event-select-card:hover {
@@ -194,7 +199,6 @@
   cursor: pointer;
 }
 
-/* Modal Forms */
 .form-group {
   margin-bottom: 1rem;
 }
@@ -208,7 +212,7 @@
   padding: 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 6px;
-  box-sizing: border-box; /* Ensures padding doesn't overflow width */
+  box-sizing: border-box;
 }
 
 .modal-footer {
@@ -241,9 +245,9 @@
   background-color: #9ca3af;
   cursor: not-allowed;
 }
-/* FORCE DARK TEXT for events listed inside the Group Card */
+
 .event-item {
-  color: #1f2937 !important; /* Dark Grey */
+  color: #1f2937 !important;
   background-color: #f9fafb;
 }
 
@@ -252,15 +256,13 @@
   font-weight: 500;
 }
 
-/* Fix for the Modal Inputs/Text */
-.modal h3, 
-.modal label, 
-.modal p, 
+.modal h3,
+.modal label,
+.modal p,
 .modal .event-select-card strong {
   color: #1f2937 !important;
 }
 
-/* Specific fix for the "Available Events" cards in the modal */
 .event-select-card {
   color: #1f2937 !important;
   background-color: #f8fafc;
@@ -268,5 +270,5 @@
 }
 
 .event-select-card small {
-  color: #6b7280 !important; /* Muted grey for dates */
+  color: #6b7280 !important;
 }

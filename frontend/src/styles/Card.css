@@ -8,7 +8,6 @@
   height: 100%;
 }
 
-
 .card-header {
   display: flex;
   align-items: center;
@@ -18,12 +17,11 @@
 
 .card-icon {
   font-size: 1.5rem;
-  
-  
+
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #3b82f6
+  color: #3b82f6;
 }
 
 .card-title {
@@ -56,7 +54,6 @@
   color: #6b7280;
 }
 
-/* Color Variants */
 .card-blue .card-icon {
   background-color: #dbeafe;
   color: #1d4ed8;
