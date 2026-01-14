@@ -49,7 +49,7 @@ export default function EventsPage() {
 
   const fetchEvents = async (isBackground = false) => {
     try {
-      const response = await fetch(`http://${API_URL}/events`, {
+      const response = await fetch(`https://${API_URL}/events`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -113,7 +113,7 @@ export default function EventsPage() {
     }
 
     try {
-      const response = await fetch(`http://${API_URL}/event-join/join`, {
+      const response = await fetch(`https://${API_URL}/event-join/join`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -141,7 +141,7 @@ export default function EventsPage() {
   const handleCreateEvent = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://${API_URL}/events`, {
+      const response = await fetch(`https://${API_URL}/events`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -185,7 +185,7 @@ export default function EventsPage() {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://${API_URL}/events/${editingEvent.id}`,
+        `https://${API_URL}/events/${editingEvent.id}`,
         {
           method: "PUT",
           headers: {
@@ -221,7 +221,7 @@ export default function EventsPage() {
     ) {
       try {
         const response = await fetch(
-          `http://${API_URL}/events/${eventId}`,
+          `https://${API_URL}/events/${eventId}`,
           {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
@@ -241,7 +241,7 @@ export default function EventsPage() {
   const handleViewParticipants = async (eventId) => {
     setLoadingParticipants(true);
     try {
-      const response = await fetch(`http://${API_URL}/events/${eventId}`, {
+      const response = await fetch(`https://${API_URL}/events/${eventId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -257,7 +257,7 @@ export default function EventsPage() {
   const handleStatusChange = async (attendanceId, newStatus) => {
     try {
       const response = await fetch(
-        `http://${API_URL}/attendance/${attendanceId}`,
+        `https://${API_URL}/attendance/${attendanceId}`,
         {
           method: "PUT",
           headers: {
@@ -283,7 +283,7 @@ export default function EventsPage() {
     setSelectedEventId(eventId);
     setShowAddManualModal(true);
     try {
-      const response = await fetch(`http://${API_URL}/participants`, {
+      const response = await fetch(`https://${API_URL}/participants`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -295,7 +295,7 @@ export default function EventsPage() {
 
   const handleAddStudentToEvent = async (studentId) => {
     try {
-      const response = await fetch(`http://${API_URL}/attendance`, {
+      const response = await fetch(`https://${API_URL}/attendance`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

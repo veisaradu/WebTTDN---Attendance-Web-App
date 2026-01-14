@@ -26,7 +26,7 @@ export default function EventGroupsPage() {
 
   const fetchData = async () => {
     try {
-      const groupsResponse = await fetch(`http://${API_URL}/event-groups`, {
+      const groupsResponse = await fetch(`https://${API_URL}/event-groups`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (groupsResponse.ok) {
@@ -34,7 +34,7 @@ export default function EventGroupsPage() {
         setGroups(Array.isArray(data) ? data : []);
       }
 
-      const eventsResponse = await fetch(`http://${API_URL}/events`, {
+      const eventsResponse = await fetch(`https://${API_URL}/events`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (eventsResponse.ok) {
@@ -56,7 +56,7 @@ export default function EventGroupsPage() {
   const handleCreateGroup = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://${API_URL}/event-groups`, {
+      const response = await fetch(`https://${API_URL}/event-groups`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +91,7 @@ export default function EventGroupsPage() {
       };
 
       const response = await fetch(
-        `http://${API_URL}/event-groups/${groupId}/events`,
+        `https://${API_URL}/event-groups/${groupId}/events`,
         {
           method: "POST",
           headers: {
@@ -121,7 +121,7 @@ export default function EventGroupsPage() {
     if (!window.confirm("Remove event from group?")) return;
     try {
       const response = await fetch(
-        `http://${API_URL}/event-groups/${groupId}/events/${eventId}`,
+        `https://${API_URL}/event-groups/${groupId}/events/${eventId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -137,7 +137,7 @@ export default function EventGroupsPage() {
     if (!window.confirm("Delete this group?")) return;
     try {
       const response = await fetch(
-        `http://${API_URL}/event-groups/${groupId}`,
+        `https://${API_URL}/event-groups/${groupId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

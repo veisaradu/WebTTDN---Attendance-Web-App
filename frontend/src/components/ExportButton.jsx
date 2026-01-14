@@ -8,7 +8,7 @@ export default function ExportButton({ type = "event", id }) {
   const handleExport = async () => {
     setLoading(true);
     try {
-      const url = `http://${API_URL}/export/${type}/${id}`;
+      const url = `https://${API_URL}/export/${type}/${id}`;
       const response = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
