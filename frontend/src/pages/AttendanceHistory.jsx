@@ -17,7 +17,7 @@ export default function AttendanceHistory() {
         }
 
         const url = isProfessor()
-          ? "http://${API_URL}/attendance/professor-history"
+          ? `http://${API_URL}/attendance/professor-history`
           : `http://${API_URL}/event-join/my-attendance/${user.id}`;
 
         const response = await fetch(url, {

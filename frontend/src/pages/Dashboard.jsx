@@ -23,12 +23,12 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const statsResponse = await fetch("http://${API_URL}/stats", {
+      const statsResponse = await fetch(`http://${API_URL}/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const statsData = await statsResponse.json();
 
-      const eventsResponse = await fetch("http://${API_URL}/events", {
+      const eventsResponse = await fetch(`http://${API_URL}/events`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const eventsData = (await eventsResponse.json()) || [];

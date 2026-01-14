@@ -26,7 +26,7 @@ export default function EventGroupsPage() {
 
   const fetchData = async () => {
     try {
-      const groupsResponse = await fetch("http://${API_URL}/event-groups", {
+      const groupsResponse = await fetch(`http://${API_URL}/event-groups`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (groupsResponse.ok) {
@@ -34,7 +34,7 @@ export default function EventGroupsPage() {
         setGroups(Array.isArray(data) ? data : []);
       }
 
-      const eventsResponse = await fetch("http://${API_URL}/events", {
+      const eventsResponse = await fetch(`http://${API_URL}/events`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (eventsResponse.ok) {
@@ -56,7 +56,7 @@ export default function EventGroupsPage() {
   const handleCreateGroup = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://${API_URL}/event-groups", {
+      const response = await fetch(`http://${API_URL}/event-groups`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
