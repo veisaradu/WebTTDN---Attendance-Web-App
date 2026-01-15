@@ -1,4 +1,9 @@
 # WebTTDN---Attendance-Web-App
+## Link pagina deployed
+https://frontend-production-d649.up.railway.app/
+
+## Link test rute
+https://webttdn-attendance-web-app-production.up.railway.app/
 
 ## Ghid de rulare
 ### 1. Instalare dependete si MySql
